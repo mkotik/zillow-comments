@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.comment {
+  p {
+    text-align: left;
+  }
+  button {
+    float: left;
+  }
+}
