@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Typography, Avatar, Button } from "@mui/material";
+import { Box, Typography, Avatar } from "@mui/material";
 
-const Comment = ({ name, content, date, replies }) => (
+const ReplyComment = ({ name, content, date }) => (
   <Box
     sx={{
       mb: 2,
@@ -22,4 +22,4 @@ const Comment = ({ name, content, date, replies }) => (
   </Box>
 );
 
-export default Comment;
+export default ReplyComment;
