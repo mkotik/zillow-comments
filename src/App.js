@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.scss";
 import CommentPage from "./CommentPage";
+import BasePage from "./BasePage";
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/homedetails/*" element={<CommentPage />} />
-          {/* Add other routes here if needed */}
+          <Route path="/*" element={<BasePage />} />
         </Routes>
       </div>
     </Router>
