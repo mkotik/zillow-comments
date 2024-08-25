@@ -10,6 +10,7 @@ const BasePage = () => {
       "/homedetails/1155-Sandpiper-St-G6-Naples-FL-34112/54181396_zpid/"
     );
   };
+
   return (
     <div>
       <h1>Welcome to the Zillow Comment Page</h1>
