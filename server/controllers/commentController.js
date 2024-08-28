@@ -14,3 +14,17 @@ exports.createComment = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
+exports.getCommentsByAddress = async (req, res) => {
+  try {
+    const { address } = req.query;
+    if (!address) {
+      return res.status(400).json({ message: "Address is required" });
+    }
+    const comments = await Comment.find({ address });
+    console.log("comments", comments);
+    res.status(200).json(comments);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching comments", error: err });
+  }
+};

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Paper, Typography, TextField, Button } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
@@ -8,7 +8,26 @@ import { parseAddress, getBaseUrl } from "./helpers";
 const CommentPage = () => {
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const baseUrl = getBaseUrl();
+        const address = parseAddress(location.pathname);
+        const response = await axios.get(`${baseUrl}/comments`, {
+          params: { address },
+        });
+        console.log("Fetched comments:", response.data);
+        setComments(response.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    fetchComments();
+  }, [location.pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,7 +82,7 @@ const CommentPage = () => {
       <Typography variant="h4" gutterBottom>
         Comments
       </Typography>
-
+      {/* 
       <Comment
         name="John Doe"
         content="This Zillow listing looks great! The location and amenities are exactly what I'm looking for."
@@ -88,7 +107,15 @@ const CommentPage = () => {
         name="Emily Martinez"
         content="I'm not sure about this listing. The photos look great, but I have some concerns about the condition of the property."
         date="3 days ago"
-      />
+      /> */}
+      {comments.map((comment, index) => (
+        <Comment
+          key={index}
+          name={comment.name}
+          content={comment.content}
+          date={comment.date}
+        />
+      ))}
     </Paper>
   );
 };

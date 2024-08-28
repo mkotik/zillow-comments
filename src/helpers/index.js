@@ -1,6 +1,6 @@
 export const parseAddress = (url) => {
   const parts = url.split("/");
-  const addressPart = parts[parts.length - 2];
+  const addressPart = parts[2];
   return addressPart.replace(/-/g, " ");
 };
 
