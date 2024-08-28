@@ -14,8 +14,6 @@ const CommentPage = () => {
     e.preventDefault();
     try {
       const baseUrl = getBaseUrl();
-      console.log("in commentpage.js");
-      console.log(baseUrl);
       const response = await axios.post(`${baseUrl}/comments`, {
         address: parseAddress(location.pathname),
         name,
