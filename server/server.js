@@ -14,6 +14,9 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Welcome to Zillow Comments API" });
+});
 // Routes
 app.use("/comments", commentRoutes);
 
