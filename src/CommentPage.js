@@ -41,6 +41,7 @@ const CommentPage = () => {
       });
 
       console.log("Comment submitted:", response.data);
+      setComments(response.data);
       setName("");
       setComment("");
     } catch (error) {
@@ -51,7 +52,7 @@ const CommentPage = () => {
   return (
     <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
       <Typography variant="body2" gutterBottom>
-        Current Path: {location.pathname}
+        {parseAddress(location.pathname).replaceAll("-", " ")}
       </Typography>
       <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
         Add a comment
@@ -79,41 +80,16 @@ const CommentPage = () => {
           Post Comment
         </Button>
       </form>
-      <Typography variant="h4" gutterBottom>
-        Comments
-      </Typography>
-      {/* 
-      <Comment
-        name="John Doe"
-        content="This Zillow listing looks great! The location and amenities are exactly what I'm looking for."
-        date="2 days ago"
-        replies={[
-          {
-            name: "Jane Doe",
-            content:
-              "I agree, this looks like a great property. The location is perfect and the price seems reasonable.",
-            date: "1 day ago",
-          },
-          {
-            name: "Sarah Anderson",
-            content:
-              "I disagree, this looks like a great property. The location is perfect and the price seems reasonable.",
-            date: "1 day ago",
-          },
-        ]}
-      />
 
-      <Comment
-        name="Emily Martinez"
-        content="I'm not sure about this listing. The photos look great, but I have some concerns about the condition of the property."
-        date="3 days ago"
-      /> */}
       {comments.map((comment, index) => (
         <Comment
           key={index}
           name={comment.name}
           content={comment.content}
           date={comment.date}
+          id={comment.id}
+          replies={comment.replies}
+          setComments={setComments}
         />
       ))}
     </Paper>

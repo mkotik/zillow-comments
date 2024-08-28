@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/database");
 const commentRoutes = require("./routes/comments");
+const replyCommentRoutes = require("./routes/replyComments");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 // Routes
 app.use("/comments", commentRoutes);
+app.use("/replycomments", replyCommentRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 6000;
