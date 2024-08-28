@@ -1,7 +1,12 @@
 export const parseAddress = (url) => {
   const parts = url.split("/");
-  const addressPart = parts[2];
-  return addressPart.replace(/-/g, " ");
+  let address = "";
+  parts.forEach((part, i) => {
+    if (part == "homedetails" || part == "b") {
+      address = parts[i + 1];
+    }
+  });
+  return address;
 };
 
 export const getBaseUrl = () => {
