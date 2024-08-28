@@ -2,18 +2,31 @@ import React, { useState } from "react";
 import { Paper, Typography, TextField, Button } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { parseAddress, getBaseUrl } from "./helpers";
 
 const CommentPage = () => {
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
   const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle comment submission here
-    console.log("Submitted:", { name, comment });
-    setName("");
-    setComment("");
+    try {
+      const baseUrl = getBaseUrl();
+      const response = await axios.post(`${baseUrl}/comments`, {
+        address: parseAddress(location.pathname),
+        name,
+        content: comment,
+        date: new Date().toISOString(),
+      });
+
+      console.log("Comment submitted:", response.data);
+      setName("");
+      setComment("");
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
   };
 
   return (
