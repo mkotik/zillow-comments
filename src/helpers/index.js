@@ -5,6 +5,8 @@ export const parseAddress = (url) => {
 };
 
 export const getBaseUrl = () => {
+  console.log(process.env.NODE_ENV);
+  console.log(process.env.REACT_APP_API_URL_PROD);
   return process.env.NODE_ENV === "production"
     ? process.env.REACT_APP_API_URL_PROD
     : process.env.REACT_APP_API_URL_LOCAL;
