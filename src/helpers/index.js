@@ -2,7 +2,7 @@ export const parseAddress = (url) => {
   const parts = url.split("/");
   let address = "";
   parts.forEach((part, i) => {
-    if (part == "homedetails" || part == "b") {
+    if (part === "homedetails" || part === "b") {
       address = parts[i + 1];
     }
   });
