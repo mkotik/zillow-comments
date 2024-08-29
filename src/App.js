@@ -9,6 +9,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/homedetails/*" element={<CommentPage />} />
+          <Route path="/b/*" element={<CommentPage />} />
           <Route path="/*" element={<BasePage />} />
         </Routes>
       </div>
