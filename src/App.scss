@@ -49,3 +49,9 @@
 .MuiFormControl-root {
   margin: 0 !important;
 }
+
+.comment-form {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}

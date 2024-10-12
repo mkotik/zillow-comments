@@ -57,7 +57,7 @@ const CommentPage = () => {
       <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
         Add a comment
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="comment-form">
         <TextField
           fullWidth
           label="Name"
