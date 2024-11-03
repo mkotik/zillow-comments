@@ -3,7 +3,7 @@ import "./App.scss";
 import CommentPage from "./CommentPage";
 import BasePage from "./BasePage";
 import LoginPage from "./LoginPage";
-import ProtectedRoute from "./ProtectedRoute";
+// import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
