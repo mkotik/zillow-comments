@@ -10,29 +10,29 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/homedetails/*"
             element={
-              <ProtectedRoute>
-                <CommentPage />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <CommentPage />
+              // </ProtectedRoute>
             }
           />
           <Route
             path="/b/*"
             element={
-              <ProtectedRoute>
-                <CommentPage />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <CommentPage />
+              // </ProtectedRoute>
             }
           />
-          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/*"
             element={
-              <ProtectedRoute>
-                <BasePage />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <BasePage />
+              // </ProtectedRoute>
             }
           />
         </Routes>
