@@ -4,6 +4,7 @@ import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { parseAddress, getBaseUrl } from "./helpers";
+import ChatIcon from "./assets/chatIcon";
 
 const CommentPage = () => {
   const [name, setName] = useState("");
@@ -76,7 +77,13 @@ const CommentPage = () => {
           onChange={(e) => setComment(e.target.value)}
           sx={{ mb: 2 }}
         />
-        <Button type="submit" variant="contained" fullWidth>
+        <Button
+          className="comment-button"
+          type="submit"
+          variant="contained"
+          fullWidth
+        >
+          <ChatIcon />
           Post Comment
         </Button>
       </form>
