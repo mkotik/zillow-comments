@@ -51,6 +51,9 @@
 }
 
 .comment {
+  background-color: #1f2a37;
+  border: 1px solid #4b5663 !important;
+  border-radius: 5px;
   p {
     text-align: left;
   }
@@ -68,9 +71,16 @@
   display: flex;
   gap: 20px;
   flex-direction: column;
+  margin-bottom: 20px;
 }
 
 .comment-button {
+  font-size: 0.875rem !important;
+  width: 180px !important;
+  height: 50px !important;
+}
+
+.general-button {
   background-image: linear-gradient(
     180deg,
     hsla(0, 0%, 100%, 0.15),
@@ -78,12 +88,42 @@
   );
   background-color: #2ea44f !important;
   box-shadow: 0 1px 1px rgba(18, 21, 26, 0.075);
-  font-size: 0.875rem !important;
-  width: 180px !important;
-  height: 50px !important;
+  color: white !important;
+  font-weight: bold !important;
 }
 
 .chat-icon {
   width: 20px;
   height: 20px;
+}
+
+.comment-input {
+  margin-bottom: 2;
+  background-color: #1f2a37;
+  border: 1px solid #4b5663 !important;
+  border-radius: 5px;
+
+  .MuiInputBase-root {
+    padding: 0px !important;
+  }
+
+  textarea {
+    padding: 13px;
+  }
+
+  .Mui-focused {
+    input,
+    textarea {
+      background-color: #374251;
+    }
+    fieldset {
+      border-color: #2ea44f !important;
+    }
+  }
+
+  :hover {
+    fieldset {
+      border-color: #2ea44f !important;
+    }
+  }
 }

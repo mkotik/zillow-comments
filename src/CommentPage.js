@@ -52,36 +52,48 @@ const CommentPage = () => {
 
   return (
     <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Typography variant="body2" gutterBottom>
-        {parseAddress(location.pathname).replaceAll("-", " ")}
-      </Typography>
-      <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-        Add a comment
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Comments:
       </Typography>
       <form onSubmit={handleSubmit} className="comment-form">
         <TextField
           fullWidth
-          label="Name"
+          // label="Name"
+          placeholder="Your Name (Optional)"
+          className="comment-input"
           variant="outlined"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          sx={{ mb: 2 }}
+          InputLabelProps={{ shrink: false }}
+          sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
         />
         <TextField
           fullWidth
-          label="Comment"
+          placeholder="Your Comment"
+          className="comment-input"
           variant="outlined"
           multiline
           rows={4}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          sx={{ mb: 2 }}
+          InputLabelProps={{ shrink: false }}
+          sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
         />
         <Button
-          className="comment-button"
+          className="comment-button general-button"
           type="submit"
           variant="contained"
           fullWidth
+          sx={{
+            gap: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "bold",
+            "&:hover": {
+              backgroundColor: "#2a934a !important",
+            },
+          }}
         >
           <ChatIcon />
           Post Comment

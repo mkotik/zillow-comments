@@ -5,7 +5,6 @@ const ReplyComment = ({ name, content, date }) => (
   <Box
     sx={{
       mb: 2,
-      boxShadow: 4,
       borderRadius: 1,
       padding: 2,
     }}

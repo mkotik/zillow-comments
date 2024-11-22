@@ -5,6 +5,7 @@ import { getBaseUrl } from "./helpers";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { parseAddress } from "./helpers";
+import ChatIcon from "./assets/chatIcon";
 
 const Comment = ({ name, content, date, replies, id, setComments }) => {
   const [isReplying, setIsReplying] = useState(false);
@@ -39,8 +40,6 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
     <Box
       sx={{
         mb: 2,
-        boxShadow: 4,
-        borderRadius: 1,
         padding: 2,
       }}
       className="comment"
@@ -54,7 +53,11 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
       </Box>
       <Typography variant="body1">{content}</Typography>
       <Box display="flex" justifyContent="flex-start">
-        <Button sx={{ mt: 1 }} onClick={() => setIsReplying(!isReplying)}>
+        <Button
+          sx={{ mt: 1, mb: 1 }}
+          onClick={() => setIsReplying(!isReplying)}
+          className="general-button"
+        >
           {isReplying ? "Cancel" : "Reply"}
         </Button>
       </Box>
@@ -69,9 +72,10 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
           }}
         >
           <TextField
+            className="comment-input"
             fullWidth
             variant="outlined"
-            placeholder="Type your reply..."
+            placeholder="Your Reply"
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             sx={{ mb: 1 }}
@@ -79,9 +83,27 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
           <Button
             variant="contained"
             onClick={handleReplySubmit}
-            sx={{ width: 200 }}
+            sx={{
+              width: 200,
+              display: "flex",
+              gap: 1,
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}
+            className="general-button"
+            // sx={{
+            //   gap: 1,
+            //   display: "flex",
+            //   alignItems: "center",
+            //   justifyContent: "center",
+            //   fontWeight: "bold",
+            //   "&:hover": {
+            //     backgroundColor: "#2a934a !important",
+            //   },
+            // }}
           >
-            Submit Reply
+            <ChatIcon />
+            Submit
           </Button>
         </Box>
       )}
