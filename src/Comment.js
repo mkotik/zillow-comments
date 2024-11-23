@@ -8,6 +8,9 @@ import { parseAddress } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import { generateAnonName } from "./helpers";
 import Cookies from "js-cookie";
+import { useForceRerender } from "./hooks/useForceRerender";
+
+const MAX_REPLY_LENGTH = 100;
 
 const Comment = ({
   name,
@@ -17,7 +20,9 @@ const Comment = ({
   id,
   setComments,
   setName,
+  activeName,
 }) => {
+  const forceRerender = useForceRerender();
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const location = useLocation();
@@ -26,7 +31,16 @@ const Comment = ({
     // if (replyContent.trim()) {
     //   onReply(replyContent);
     // }
-    let currentName = Cookies.get("name");
+    let currentName = activeName;
+    if (currentName.trim() === "") {
+      currentName = Cookies.get("name");
+    } else {
+      Cookies.set("name", currentName, {
+        sameSite: "None",
+        secure: true,
+      });
+      forceRerender();
+    }
     if (!currentName) {
       currentName = generateAnonName();
       Cookies.set("name", currentName, {
@@ -90,15 +104,24 @@ const Comment = ({
             gap: "10px",
           }}
         >
-          <TextField
-            className="comment-input"
-            fullWidth
-            variant="outlined"
-            placeholder="Your Reply"
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            sx={{ mb: 1 }}
-          />
+          <Box sx={{ position: "relative", width: "100%" }}>
+            <TextField
+              className="comment-input"
+              fullWidth
+              variant="outlined"
+              placeholder="Your Reply"
+              value={replyContent}
+              onChange={(e) => {
+                if (e.target.value.length <= MAX_REPLY_LENGTH) {
+                  setReplyContent(e.target.value);
+                }
+              }}
+              sx={{ mb: 1 }}
+            />
+            <span className="char-limit">
+              {replyContent.length}/{MAX_REPLY_LENGTH}
+            </span>
+          </Box>
           <Button
             variant="contained"
             onClick={handleReplySubmit}

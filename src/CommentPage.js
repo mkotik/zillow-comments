@@ -11,6 +11,8 @@ import DoneIcon from "@mui/icons-material/Done";
 import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
 
+const MAX_COMMENT_LENGTH = 200;
+const MAX_NAME_LENGTH = 30;
 const CommentPage = () => {
   const forceRerender = useForceRerender();
   const [name, setName] = useState(
@@ -109,7 +111,11 @@ const CommentPage = () => {
               className="comment-input"
               variant="outlined"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= MAX_NAME_LENGTH) {
+                  setName(e.target.value);
+                }
+              }}
               InputLabelProps={{ shrink: false }}
               sx={{
                 "& legend": { display: "none" },
@@ -137,24 +143,33 @@ const CommentPage = () => {
             </Button>
           </Box>
         )}
-        <TextField
-          fullWidth
-          placeholder="Your Comment"
-          className="comment-input"
-          variant="outlined"
-          multiline
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          InputLabelProps={{ shrink: false }}
-          sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
-            }
-          }}
-        />
+        <Box sx={{ position: "relative", width: "100%" }}>
+          <TextField
+            fullWidth
+            placeholder="Your Comment"
+            className="comment-input"
+            variant="outlined"
+            multiline
+            rows={4}
+            value={comment}
+            onChange={(e) => {
+              if (e.target.value.length <= MAX_COMMENT_LENGTH) {
+                setComment(e.target.value);
+              }
+            }}
+            InputLabelProps={{ shrink: false }}
+            sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+          />
+          <span className="char-limit">
+            {comment.length}/{MAX_COMMENT_LENGTH}
+          </span>
+        </Box>
         <Button
           className="comment-button general-button"
           type="submit"
@@ -180,6 +195,7 @@ const CommentPage = () => {
         <Comment
           setName={setName}
           key={index}
+          activeName={name}
           name={comment.name}
           content={comment.content}
           date={comment.date}
