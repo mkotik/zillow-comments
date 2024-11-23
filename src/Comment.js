@@ -118,6 +118,12 @@ const Comment = ({
                   setReplyContent(e.target.value);
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleReplySubmit(e);
+                }
+              }}
               sx={{ mb: 1 }}
             />
             <span className="char-limit">
