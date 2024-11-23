@@ -90,7 +90,10 @@ const CommentPage = () => {
               className="general-button"
               sx={{ height: "57.5px" }}
               onClick={() => {
-                Cookies.remove("name");
+                Cookies.remove("name", {
+                  sameSite: "None",
+                  secure: true,
+                });
                 setName("");
               }}
             >
