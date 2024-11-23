@@ -29,9 +29,9 @@ const Comment = ({
   const location = useLocation();
 
   const handleReplySubmit = async (e) => {
-    // if (replyContent.trim()) {
-    //   onReply(replyContent);
-    // }
+    e.preventDefault();
+    if (!replyContent.trim()) return;
+
     let currentName = activeName;
     if (currentName.trim() === "") {
       currentName = Cookies.get("name");
@@ -50,7 +50,6 @@ const Comment = ({
       });
       setName(currentName);
     }
-    e.preventDefault();
     try {
       const baseUrl = getBaseUrl();
       const response = await axios.post(`${baseUrl}/replycomments`, {

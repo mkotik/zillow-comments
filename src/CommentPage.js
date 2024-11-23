@@ -42,6 +42,8 @@ const CommentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!comment.trim()) return;
+
     const anonymousName = generateAnonName();
     console.log(name);
     Cookies.set("name", name.trim() === "" ? anonymousName : name.trim(), {
