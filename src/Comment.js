@@ -6,8 +6,18 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { parseAddress } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
+import { generateAnonName } from "./helpers";
+import Cookies from "js-cookie";
 
-const Comment = ({ name, content, date, replies, id, setComments }) => {
+const Comment = ({
+  name,
+  content,
+  date,
+  replies,
+  id,
+  setComments,
+  setName,
+}) => {
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const location = useLocation();
@@ -16,12 +26,18 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
     // if (replyContent.trim()) {
     //   onReply(replyContent);
     // }
+    let currentName = Cookies.get("name");
+    if (!currentName) {
+      currentName = generateAnonName();
+      Cookies.set("name", currentName);
+      setName(currentName);
+    }
     e.preventDefault();
     try {
       const baseUrl = getBaseUrl();
       const response = await axios.post(`${baseUrl}/replycomments`, {
         address: parseAddress(location.pathname),
-        name: "John Doe",
+        name: currentName,
         content: replyContent,
         parentCommentId: id,
         date: new Date().toISOString(),

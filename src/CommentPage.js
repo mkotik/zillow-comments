@@ -7,9 +7,12 @@ import { parseAddress, getBaseUrl } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import Cookies from "js-cookie";
 import EditIcon from "@mui/icons-material/Edit";
+import DoneIcon from "@mui/icons-material/Done";
 import { generateAnonName } from "./helpers";
+import { useForceRerender } from "./hooks/useForceRerender";
 
 const CommentPage = () => {
+  const forceRerender = useForceRerender();
   const [name, setName] = useState(
     Cookies.get("name") ? Cookies.get("name") : ""
   );
@@ -71,6 +74,7 @@ const CommentPage = () => {
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
+              height: "57.5px",
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -81,6 +85,7 @@ const CommentPage = () => {
             </Box>
             <Button
               className="general-button"
+              sx={{ height: "57.5px" }}
               onClick={() => {
                 Cookies.remove("name");
                 setName("");
@@ -90,17 +95,38 @@ const CommentPage = () => {
             </Button>
           </Box>
         ) : (
-          <TextField
-            fullWidth
-            // label="Name"
-            placeholder="Your Name (Optional)"
-            className="comment-input"
-            variant="outlined"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            InputLabelProps={{ shrink: false }}
-            sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
-          />
+          <Box sx={{ display: "flex", width: "100%", gap: "10px" }}>
+            <TextField
+              fullWidth
+              // label="Name"
+              placeholder="Your Name (Optional)"
+              className="comment-input"
+              variant="outlined"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              InputLabelProps={{ shrink: false }}
+              sx={{
+                "& legend": { display: "none" },
+                "& fieldset": { top: 0 },
+              }}
+            />
+            <Button
+              className="general-button"
+              onClick={() => {
+                let newName;
+                if (name.trim() === "") {
+                  newName = generateAnonName();
+                } else {
+                  newName = name.trim();
+                }
+                Cookies.set("name", newName);
+                setName(newName);
+                forceRerender();
+              }}
+            >
+              <DoneIcon />
+            </Button>
+          </Box>
         )}
         <TextField
           fullWidth
@@ -143,6 +169,7 @@ const CommentPage = () => {
 
       {comments.map((comment, index) => (
         <Comment
+          setName={setName}
           key={index}
           name={comment.name}
           content={comment.content}
