@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Typography, TextField, Button } from "@mui/material";
+import { Paper, Typography, TextField, Button, Box } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { parseAddress, getBaseUrl } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
+import Cookies from "js-cookie";
+import EditIcon from "@mui/icons-material/Edit";
+import { generateAnonName } from "./helpers";
 
 const CommentPage = () => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(
+    Cookies.get("name") ? Cookies.get("name") : ""
+  );
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const location = useLocation();
@@ -32,18 +37,21 @@ const CommentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const anonymousName = generateAnonName();
+    console.log(name);
+    Cookies.set("name", name.trim() === "" ? anonymousName : name.trim());
     try {
       const baseUrl = getBaseUrl();
       const response = await axios.post(`${baseUrl}/comments`, {
         address: parseAddress(location.pathname),
-        name,
+        name: name.trim() === "" ? anonymousName : name.trim(),
         content: comment,
         date: new Date().toISOString(),
       });
 
       console.log("Comment submitted:", response.data);
       setComments(response.data);
-      setName("");
+      setName(Cookies.get("name") || "");
       setComment("");
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -56,17 +64,44 @@ const CommentPage = () => {
         Comments:
       </Typography>
       <form onSubmit={handleSubmit} className="comment-form">
-        <TextField
-          fullWidth
-          // label="Name"
-          placeholder="Your Name (Optional)"
-          className="comment-input"
-          variant="outlined"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          InputLabelProps={{ shrink: false }}
-          sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
-        />
+        {Cookies.get("name") ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Typography sx={{ fontWeight: "bold" }} y>
+                Name:{" "}
+              </Typography>
+              <Typography>{Cookies.get("name")}</Typography>
+            </Box>
+            <Button
+              className="general-button"
+              onClick={() => {
+                Cookies.remove("name");
+                setName("");
+              }}
+            >
+              <EditIcon />
+            </Button>
+          </Box>
+        ) : (
+          <TextField
+            fullWidth
+            // label="Name"
+            placeholder="Your Name (Optional)"
+            className="comment-input"
+            variant="outlined"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            InputLabelProps={{ shrink: false }}
+            sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
+          />
+        )}
         <TextField
           fullWidth
           placeholder="Your Comment"
@@ -78,6 +113,12 @@ const CommentPage = () => {
           onChange={(e) => setComment(e.target.value)}
           InputLabelProps={{ shrink: false }}
           sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
         />
         <Button
           className="comment-button general-button"

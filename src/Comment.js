@@ -91,16 +91,6 @@ const Comment = ({ name, content, date, replies, id, setComments }) => {
               paddingRight: 0,
             }}
             className="general-button"
-            // sx={{
-            //   gap: 1,
-            //   display: "flex",
-            //   alignItems: "center",
-            //   justifyContent: "center",
-            //   fontWeight: "bold",
-            //   "&:hover": {
-            //     backgroundColor: "#2a934a !important",
-            //   },
-            // }}
           >
             <ChatIcon />
             Submit
