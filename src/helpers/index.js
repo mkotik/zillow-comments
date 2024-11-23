@@ -35,7 +35,6 @@ export const formatTimestamp = (dateString) => {
   const diffInDays = Math.floor(diffInHours / 24);
   const diffInWeeks = Math.floor(diffInDays / 7);
   const diffInMonths = Math.floor(diffInDays / 30);
-  const diffInYears = Math.floor(diffInDays / 365);
 
   if (diffInMinutes < 60) {
     return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
