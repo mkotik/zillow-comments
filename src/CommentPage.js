@@ -42,7 +42,10 @@ const CommentPage = () => {
     e.preventDefault();
     const anonymousName = generateAnonName();
     console.log(name);
-    Cookies.set("name", name.trim() === "" ? anonymousName : name.trim());
+    Cookies.set("name", name.trim() === "" ? anonymousName : name.trim(), {
+      sameSite: "None",
+      secure: true,
+    });
     try {
       const baseUrl = getBaseUrl();
       const response = await axios.post(`${baseUrl}/comments`, {
@@ -119,7 +122,10 @@ const CommentPage = () => {
                 } else {
                   newName = name.trim();
                 }
-                Cookies.set("name", newName);
+                Cookies.set("name", newName, {
+                  sameSite: "None",
+                  secure: true,
+                });
                 setName(newName);
                 forceRerender();
               }}

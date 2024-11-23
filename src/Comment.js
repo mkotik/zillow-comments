@@ -29,7 +29,10 @@ const Comment = ({
     let currentName = Cookies.get("name");
     if (!currentName) {
       currentName = generateAnonName();
-      Cookies.set("name", currentName);
+      Cookies.set("name", currentName, {
+        sameSite: "None",
+        secure: true,
+      });
       setName(currentName);
     }
     e.preventDefault();
