@@ -17,7 +17,9 @@ const ReplyComment = ({ name, content, date }) => (
         {date}
       </Typography>
     </Box>
-    <Typography variant="body1">{content}</Typography>
+    <Typography className="reply-comment-content" variant="body1">
+      {content}
+    </Typography>
   </Box>
 );
 

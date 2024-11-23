@@ -134,3 +134,14 @@
   bottom: 20px;
   right: 20px;
 }
+
+.reply-comment-input {
+  input {
+    padding-right: 80px;
+  }
+}
+
+.comment-content,
+.reply-comment-content {
+  hyphens: auto;
+}

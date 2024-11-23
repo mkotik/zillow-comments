@@ -84,7 +84,9 @@ const Comment = ({
           {date}
         </Typography>
       </Box>
-      <Typography variant="body1">{content}</Typography>
+      <Typography className="comment-content" variant="body1">
+        {content}
+      </Typography>
       <Box display="flex" justifyContent="flex-start">
         <Button
           sx={{ mt: 1, mb: 1 }}
@@ -106,7 +108,7 @@ const Comment = ({
         >
           <Box sx={{ position: "relative", width: "100%" }}>
             <TextField
-              className="comment-input"
+              className="comment-input reply-comment-input"
               fullWidth
               variant="outlined"
               placeholder="Your Reply"
