@@ -9,6 +9,7 @@ import ChatIcon from "./assets/chatIcon";
 import { generateAnonName } from "./helpers";
 import Cookies from "js-cookie";
 import { useForceRerender } from "./hooks/useForceRerender";
+import { formatTimestamp } from "./helpers";
 
 const MAX_REPLY_LENGTH = 100;
 
@@ -81,7 +82,7 @@ const Comment = ({
         <Avatar sx={{ mr: 1 }}>{name[0]}</Avatar>
         <Typography variant="subtitle1">{name}</Typography>
         <Typography variant="caption" sx={{ ml: "auto" }}>
-          {date}
+          {formatTimestamp(date)}
         </Typography>
       </Box>
       <Typography className="comment-content" variant="body1">
