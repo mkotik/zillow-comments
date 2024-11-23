@@ -8,7 +8,7 @@ exports.getCommentsByAddressFromDB = async (address) => {
 
   const replyComments = await ReplyComment.find({
     parentCommentId: { $in: commentIds },
-  }).sort({ date: 1 }); // Sort reply comments by date in ascending order
+  }).sort({ date: -1 }); // Changed from 1 to -1 for descending order
 
   const commentMap = comments.reduce((acc, comment) => {
     acc[comment.id] = { ...comment.toObject(), replies: [] };
