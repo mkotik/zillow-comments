@@ -34,9 +34,10 @@ exports.createComment = async (req, res) => {
     address: req.body.address,
     name: req.body.name,
     content: req.body.content,
+    attachments: req.body.attachments || [],
     date: req.body.date || Date.now(),
   });
-  console.log("newComment", newComment);
+
   try {
     await newComment.save();
     const comments = await this.getCommentsByAddressFromDB(req.body.address);

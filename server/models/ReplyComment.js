@@ -5,6 +5,15 @@ const replyCommentSchema = new mongoose.Schema({
   address: String,
   name: String,
   content: String,
+  attachments: [
+    {
+      url: String,
+      filename: String,
+      contentType: String,
+      size: Number,
+      isImage: Boolean,
+    },
+  ],
   parentCommentId: { type: String, required: true },
   date: { type: Date, default: Date.now },
 });

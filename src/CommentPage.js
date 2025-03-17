@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Typography, TextField, Button, Box } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Divider,
+} from "@mui/material";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
@@ -10,9 +17,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
+import FileUpload from "./FileUpload";
+import AttachmentPreview from "./AttachmentPreview";
 
 const MAX_COMMENT_LENGTH = 400;
 const MAX_NAME_LENGTH = 30;
+
 const CommentPage = () => {
   const forceRerender = useForceRerender();
   const [name, setName] = useState(
@@ -20,6 +30,7 @@ const CommentPage = () => {
   );
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -42,7 +53,7 @@ const CommentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    if (!comment.trim() && attachments.length === 0) return;
 
     const anonymousName = generateAnonName();
     console.log(name);
@@ -56,6 +67,7 @@ const CommentPage = () => {
         address: parseAddress(location.pathname),
         name: name.trim() === "" ? anonymousName : name.trim(),
         content: comment,
+        attachments: attachments,
         date: new Date().toISOString(),
       });
 
@@ -63,9 +75,14 @@ const CommentPage = () => {
       setComments(response.data);
       setName(Cookies.get("name") || "");
       setComment("");
+      setAttachments([]);
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
+  };
+
+  const handleUploadComplete = (uploadedAttachments) => {
+    setAttachments(uploadedAttachments);
   };
 
   return (
@@ -82,9 +99,7 @@ const CommentPage = () => {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography sx={{ fontWeight: "bold" }} y>
-                Name:{" "}
-              </Typography>
+              <Typography sx={{ fontWeight: "bold" }}>Name: </Typography>
               <Typography>{Cookies.get("name")}</Typography>
             </Box>
             <Button
@@ -105,7 +120,6 @@ const CommentPage = () => {
           <Box sx={{ display: "flex", width: "100%", gap: "10px" }}>
             <TextField
               fullWidth
-              // label="Name"
               placeholder="Your Name (Optional)"
               className="comment-input"
               variant="outlined"
@@ -145,14 +159,10 @@ const CommentPage = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "row", xxs: "column" },
+            flexDirection: { xs: "column", md: "row" },
             gap: "10px",
             width: "100%",
-            alignItems: { xs: "flex-start", xxs: "stretch" },
-            "@media (max-width: 300px)": {
-              flexDirection: "column",
-              alignItems: "stretch",
-            },
+            alignItems: "stretch",
           }}
         >
           <Box sx={{ position: "relative", width: "100%", flexGrow: 1 }}>
@@ -181,6 +191,18 @@ const CommentPage = () => {
                 }
               }}
             />
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                textAlign: "right",
+                mt: 0.5,
+                color:
+                  comment.length >= MAX_COMMENT_LENGTH ? "#ff6b6b" : "inherit",
+              }}
+            >
+              {comment.length}/{MAX_COMMENT_LENGTH} characters
+            </Typography>
           </Box>
           <Box
             sx={{
@@ -195,6 +217,7 @@ const CommentPage = () => {
               className="comment-button general-button"
               type="submit"
               variant="contained"
+              disabled={!comment.trim() && attachments.length === 0}
               sx={{
                 minWidth: { xs: "180px", "@media (max-width: 300px)": "100%" },
                 height: { xs: "100px" },
@@ -211,18 +234,32 @@ const CommentPage = () => {
               <ChatIcon />
               Post Comment
             </Button>
-            <Typography
-              variant="caption"
-              sx={{
-                textAlign: "center",
-                color:
-                  comment.length >= MAX_COMMENT_LENGTH ? "#ff6b6b" : "inherit",
-              }}
-            >
-              {comment.length}/{MAX_COMMENT_LENGTH} characters
-            </Typography>
           </Box>
         </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* File upload component */}
+        <FileUpload onUploadComplete={handleUploadComplete} />
+
+        {/* Attachment preview */}
+        {attachments.length > 0 && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Attachments ({attachments.length})
+            </Typography>
+            <AttachmentPreview attachments={attachments} />
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={() => setAttachments([])}
+              sx={{ mt: 1 }}
+            >
+              Clear All Attachments
+            </Button>
+          </Box>
+        )}
       </form>
 
       {comments.map((comment, index) => (
@@ -235,6 +272,7 @@ const CommentPage = () => {
           date={comment.date}
           id={comment.id}
           replies={comment.replies}
+          attachments={comment.attachments}
           setComments={setComments}
         />
       ))}

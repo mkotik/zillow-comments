@@ -5,6 +5,15 @@ const commentSchema = new mongoose.Schema({
   address: String,
   name: String,
   content: String,
+  attachments: [
+    {
+      url: String,
+      filename: String,
+      contentType: String,
+      size: Number,
+      isImage: Boolean,
+    },
+  ],
   date: { type: Date, default: Date.now },
 });
 
