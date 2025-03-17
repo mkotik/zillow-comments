@@ -175,8 +175,10 @@ const CommentPage = () => {
           sx={{
             display: "flex",
             flexDirection: { xs: "row" },
+            justifyContent: "center", // Set a default value
             "@media (max-width: 400px)": {
               flexDirection: "column",
+              justifyContent: "flex-start !important",
             },
             gap: "10px",
             width: "100%",
@@ -206,6 +208,61 @@ const CommentPage = () => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   handleSubmit(e);
+                }
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.classList.add("drag-over");
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.classList.remove("drag-over");
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.classList.remove("drag-over");
+
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                  if (attachments.length >= 6) {
+                    alert("Maximum 6 files allowed per comment");
+                    return;
+                  }
+
+                  const fileUploader = async () => {
+                    setUploading(true);
+                    try {
+                      const formData = new FormData();
+                      const filesToUpload = Array.from(
+                        e.dataTransfer.files
+                      ).slice(0, 6 - attachments.length);
+
+                      filesToUpload.forEach((file) => {
+                        formData.append("attachments", file);
+                      });
+
+                      const baseUrl = getBaseUrl();
+                      const response = await axios.post(
+                        `${baseUrl}/files/upload`,
+                        formData,
+                        {
+                          headers: {
+                            "Content-Type": "multipart/form-data",
+                          },
+                        }
+                      );
+
+                      handleUploadComplete(response.data.attachments);
+                    } catch (error) {
+                      console.error("Error uploading files:", error);
+                    } finally {
+                      setUploading(false);
+                    }
+                  };
+
+                  fileUploader();
                 }
               }}
               InputProps={{
@@ -390,7 +447,7 @@ const CommentPage = () => {
               display: "flex",
               flexDirection: "column",
               gap: "5px",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               alignItems: "center",
             }}
           >
@@ -400,13 +457,14 @@ const CommentPage = () => {
               variant="contained"
               disabled={!comment.trim() && attachments.length === 0}
               sx={{
-                minWidth: { xs: "180px", "@media (max-width: 300px)": "100%" },
-                height: { xs: "100px" },
+                minWidth: { sm: "180px" },
+                height: { xs: "50px", sm: "100px" },
                 gap: 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "bold",
+                width: { xs: "100%", sm: "auto" },
                 "&:hover": {
                   backgroundColor: "#2a934a !important",
                 },
