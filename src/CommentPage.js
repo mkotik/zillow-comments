@@ -145,10 +145,14 @@ const CommentPage = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
+            flexDirection: { xs: "row", xxs: "column" },
             gap: "10px",
             width: "100%",
-            alignItems: { xs: "stretch", sm: "flex-start" },
+            alignItems: { xs: "flex-start", xxs: "stretch" },
+            "@media (max-width: 300px)": {
+              flexDirection: "column",
+              alignItems: "stretch",
+            },
           }}
         >
           <Box sx={{ position: "relative", width: "100%", flexGrow: 1 }}>
@@ -178,14 +182,22 @@ const CommentPage = () => {
               }}
             />
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Button
               className="comment-button general-button"
               type="submit"
               variant="contained"
               sx={{
-                minWidth: { xs: "100%", sm: "180px" },
-                height: { sm: "100px" },
+                minWidth: { xs: "180px", "@media (max-width: 300px)": "100%" },
+                height: { xs: "100px" },
                 gap: 1,
                 display: "flex",
                 alignItems: "center",

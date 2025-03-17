@@ -101,10 +101,14 @@ const Comment = ({
           sx={{
             mt: 2,
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: { xs: "stretch", sm: "flex-start" },
+            flexDirection: { xs: "row", xxs: "column" },
+            alignItems: { xs: "flex-start", xxs: "stretch" },
             marginBottom: "20px",
             gap: "10px",
+            "@media (max-width: 300px)": {
+              flexDirection: "column",
+              alignItems: "stretch",
+            },
           }}
         >
           <Box
@@ -143,8 +147,8 @@ const Comment = ({
               variant="contained"
               onClick={handleReplySubmit}
               sx={{
-                minWidth: { xs: "100%", sm: "120px" },
-                height: { sm: "56px" },
+                minWidth: { xs: "120px", "@media (max-width: 500px)": "100%" },
+                height: { xs: "56px" },
                 display: "flex",
                 gap: 1,
                 justifyContent: "center",
