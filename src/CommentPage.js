@@ -89,7 +89,7 @@ const CommentPage = () => {
   };
 
   const handleUploadComplete = (uploadedAttachments) => {
-    setAttachments(uploadedAttachments);
+    setAttachments((prev) => [...prev, ...uploadedAttachments]);
   };
 
   return (

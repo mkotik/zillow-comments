@@ -89,7 +89,7 @@ const Comment = ({
   };
 
   const handleReplyUploadComplete = (uploadedAttachments) => {
-    setReplyAttachments(uploadedAttachments);
+    setReplyAttachments((prev) => [...prev, ...uploadedAttachments]);
   };
 
   return (
