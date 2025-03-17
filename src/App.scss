@@ -12,9 +12,9 @@
     label {
       color: white !important;
     }
-  }
-  > div {
-    max-width: 100%;
+    > div {
+      max-width: 100%;
+    }
   }
 }
 
@@ -106,7 +106,8 @@
   background-color: #1f2a37;
   border: 1px solid #4b5663 !important;
   border-radius: 5px;
-  transition: all 0.2s ease;
+  position: relative;
+  transition: all 0.3s ease;
 
   .MuiInputBase-root {
     padding: 0px !important;
@@ -132,24 +133,37 @@
     }
   }
 
+  /* Unified drag overlay for main comments and replies */
+  .drag-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(46, 164, 79, 0.2);
+    border: 2px dashed #2ea44f;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .drag-overlay-text {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+  }
+
   &.drag-over {
     border-color: #2ea44f !important;
-    background-color: #2a3441 !important;
 
-    &::after {
-      content: "Drop files here";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+    .drag-overlay {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      font-size: 1.2rem;
-      z-index: 1;
     }
   }
 }

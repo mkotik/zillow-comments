@@ -175,7 +175,7 @@ const CommentPage = () => {
           sx={{
             display: "flex",
             flexDirection: { xs: "row" },
-            justifyContent: "center", // Set a default value
+            justifyContent: "center",
             "@media (max-width: 400px)": {
               flexDirection: "column",
               justifyContent: "flex-start !important",
@@ -203,6 +203,7 @@ const CommentPage = () => {
               sx={{
                 "& legend": { display: "none" },
                 "& fieldset": { top: 0 },
+                position: "relative", // Ensure position is relative for overlay
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -210,15 +211,28 @@ const CommentPage = () => {
                   handleSubmit(e);
                 }
               }}
-              onDragOver={(e) => {
+              // Use dragenter instead of dragover for less frequent events
+              onDragEnter={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                // Add class to parent container for better targeting
                 e.currentTarget.classList.add("drag-over");
+              }}
+              onDragOver={(e) => {
+                // Just prevent default to allow drop, but don't add class here
+                e.preventDefault();
+                e.stopPropagation();
               }}
               onDragLeave={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                e.currentTarget.classList.remove("drag-over");
+                // Only remove class if we're leaving the actual text field (not a child element)
+                if (
+                  e.currentTarget === e.target ||
+                  !e.currentTarget.contains(e.relatedTarget)
+                ) {
+                  e.currentTarget.classList.remove("drag-over");
+                }
               }}
               onDrop={(e) => {
                 e.preventDefault();
@@ -266,13 +280,33 @@ const CommentPage = () => {
                 }
               }}
               InputProps={{
+                // Add drag overlay div inside TextField
+                startAdornment: (
+                  <Box
+                    className="drag-overlay"
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: "none", // Hidden by default, shown via .drag-over class
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 10,
+                    }}
+                  >
+                    <Box className="drag-overlay-text">Drop files here</Box>
+                  </Box>
+                ),
+                // Keep the original endAdornment with the upload button
                 endAdornment: (
                   <Box
                     sx={{
                       position: "absolute",
                       bottom: "8px",
                       right: "8px",
-                      zIndex: 1,
+                      zIndex: 11, // Higher than overlay
                     }}
                   >
                     <input
@@ -447,7 +481,7 @@ const CommentPage = () => {
               display: "flex",
               flexDirection: "column",
               gap: "5px",
-              justifyContent: "flex-start",
+              justifyContent: "center",
               alignItems: "center",
             }}
           >
@@ -475,10 +509,6 @@ const CommentPage = () => {
             </Button>
           </Box>
         </Box>
-
-        {/* FileUpload component removed since we now have inline attachment functionality */}
-
-        {/* Removed external attachment preview since it's now shown in the textarea */}
       </form>
 
       {comments.map((comment, index) => (
