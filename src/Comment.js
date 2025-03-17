@@ -11,7 +11,7 @@ import Cookies from "js-cookie";
 import { useForceRerender } from "./hooks/useForceRerender";
 import { formatTimestamp } from "./helpers";
 
-const MAX_REPLY_LENGTH = 100;
+const MAX_REPLY_LENGTH = 200;
 
 const Comment = ({
   name,

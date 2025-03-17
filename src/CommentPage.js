@@ -12,7 +12,7 @@ import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
 import logoWithText from "./assets/logo-w-text.png";
 
-const MAX_COMMENT_LENGTH = 200;
+const MAX_COMMENT_LENGTH = 400;
 const MAX_NAME_LENGTH = 30;
 const CommentPage = () => {
   const forceRerender = useForceRerender();
@@ -71,12 +71,6 @@ const CommentPage = () => {
 
   return (
     <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
-      <img
-        src={logoWithText}
-        alt="logo"
-        className="logo-with-text"
-        style={{ height: "60px", marginBottom: "20px" }}
-      />
       <form onSubmit={handleSubmit} className="comment-form">
         {Cookies.get("name") ? (
           <Box
