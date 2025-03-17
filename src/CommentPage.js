@@ -6,6 +6,7 @@ import {
   Button,
   Box,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
@@ -15,9 +16,14 @@ import ChatIcon from "./assets/chatIcon";
 import Cookies from "js-cookie";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import ClearIcon from "@mui/icons-material/Clear";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
+import TableChartIcon from "@mui/icons-material/TableChart";
 import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
-import FileUpload from "./FileUpload";
 import AttachmentPreview from "./AttachmentPreview";
 
 const MAX_COMMENT_LENGTH = 400;
@@ -31,6 +37,7 @@ const CommentPage = () => {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -190,6 +197,78 @@ const CommentPage = () => {
                   handleSubmit(e);
                 }
               }}
+              InputProps={{
+                endAdornment: (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: "8px",
+                      right: "8px",
+                      zIndex: 1,
+                    }}
+                  >
+                    <input
+                      type="file"
+                      id="comment-file-input"
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          const fileUploader = async () => {
+                            setUploading(true);
+                            try {
+                              const formData = new FormData();
+                              Array.from(e.target.files).forEach((file) => {
+                                formData.append("attachments", file);
+                              });
+
+                              const baseUrl = getBaseUrl();
+                              const response = await axios.post(
+                                `${baseUrl}/files/upload`,
+                                formData,
+                                {
+                                  headers: {
+                                    "Content-Type": "multipart/form-data",
+                                  },
+                                }
+                              );
+
+                              handleUploadComplete(response.data.attachments);
+                            } catch (error) {
+                              console.error("Error uploading files:", error);
+                            } finally {
+                              setUploading(false);
+                              // Clear the input
+                              e.target.value = null;
+                            }
+                          };
+
+                          fileUploader();
+                        }
+                      }}
+                      style={{ display: "none" }}
+                      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                    />
+                    <Button
+                      onClick={() =>
+                        document.getElementById("comment-file-input").click()
+                      }
+                      sx={{
+                        minWidth: "36px",
+                        width: "36px",
+                        height: "36px",
+                        padding: 0,
+                        borderRadius: "50%",
+                      }}
+                    >
+                      {uploading ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <AttachFileIcon fontSize="small" />
+                      )}
+                    </Button>
+                  </Box>
+                ),
+              }}
             />
             <Typography
               variant="caption"
@@ -203,6 +282,93 @@ const CommentPage = () => {
             >
               {comment.length}/{MAX_COMMENT_LENGTH} characters
             </Typography>
+
+            {/* Attachment previews below the text input */}
+            {attachments.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  mt: 1,
+                  mb: 1,
+                }}
+              >
+                {attachments.map((attachment, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      width: "50px",
+                      height: "50px",
+                      position: "relative",
+                      borderRadius: "4px",
+                      overflow: "hidden",
+                      border: "1px solid #e0e0e0",
+                      backgroundColor: "#f5f5f5",
+                      "&:hover .delete-icon": {
+                        display: "flex",
+                      },
+                    }}
+                  >
+                    {attachment.isImage ? (
+                      <img
+                        src={attachment.url}
+                        alt={attachment.filename}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {attachment.contentType.includes("pdf") ? (
+                          <PictureAsPdfIcon sx={{ color: "#f44336" }} />
+                        ) : attachment.contentType.includes("word") ||
+                          attachment.contentType.includes("document") ? (
+                          <DescriptionIcon sx={{ color: "#2196f3" }} />
+                        ) : attachment.contentType.includes("excel") ||
+                          attachment.contentType.includes("sheet") ? (
+                          <TableChartIcon sx={{ color: "#4caf50" }} />
+                        ) : (
+                          <InsertDriveFileIcon sx={{ color: "#757575" }} />
+                        )}
+                      </Box>
+                    )}
+                    <Box
+                      className="delete-icon"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0,
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "none",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        const newAttachments = [...attachments];
+                        newAttachments.splice(index, 1);
+                        setAttachments(newAttachments);
+                      }}
+                    >
+                      <ClearIcon sx={{ color: "white" }} />
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Box>
           <Box
             sx={{
@@ -237,29 +403,9 @@ const CommentPage = () => {
           </Box>
         </Box>
 
-        <Divider sx={{ my: 2 }} />
+        {/* FileUpload component removed since we now have inline attachment functionality */}
 
-        {/* File upload component */}
-        <FileUpload onUploadComplete={handleUploadComplete} />
-
-        {/* Attachment preview */}
-        {attachments.length > 0 && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Attachments ({attachments.length})
-            </Typography>
-            <AttachmentPreview attachments={attachments} />
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={() => setAttachments([])}
-              sx={{ mt: 1 }}
-            >
-              Clear All Attachments
-            </Button>
-          </Box>
-        )}
+        {/* Removed external attachment preview since it's now shown in the textarea */}
       </form>
 
       {comments.map((comment, index) => (

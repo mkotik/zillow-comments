@@ -6,12 +6,16 @@ const connectDB = require("./config/database");
 const commentRoutes = require("./routes/comments");
 const replyCommentRoutes = require("./routes/replyComments");
 const fileRoutes = require("./routes/files");
+const path = require("path");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the uploads directory (as fallback for local development)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to MongoDB
 connectDB();

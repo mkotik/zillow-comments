@@ -140,6 +140,7 @@
   hyphens: auto;
 }
 
+/* File upload styles */
 .drop-area {
   transition: all 0.3s ease;
 
@@ -149,45 +150,64 @@
   }
 }
 
-/* Attachment previews */
-.attachment-preview {
-  display: inline-block;
-  margin: 5px;
+/* Attachment preview thumbnails */
+.attachment-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.attachment-preview-item {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+  transition: transform 0.2s ease;
+}
+
+.attachment-preview-item:hover {
+  transform: scale(1.05);
+}
+
+.attachment-preview-item .delete-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.attachment-preview-item:hover .delete-icon {
+  display: flex;
+}
+
+/* Attachment display in comments */
+.comment-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comment-attachment {
   position: relative;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-.attachment-preview img {
+.comment-attachment img {
   object-fit: cover;
   width: 100%;
   height: 100%;
-}
-
-.attachment-preview .filename {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 2px 5px;
-  font-size: 10px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* Attachment dialog */
-.attachment-dialog-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-}
-
-.attachment-dialog-content img {
-  max-width: 100%;
-  max-height: 80vh;
 }
