@@ -89,7 +89,15 @@ const Comment = ({
   };
 
   const handleReplyUploadComplete = (uploadedAttachments) => {
-    setReplyAttachments((prev) => [...prev, ...uploadedAttachments]);
+    setReplyAttachments((prev) => {
+      // Limit to 6 files total
+      const combined = [...prev, ...uploadedAttachments];
+      if (combined.length > 6) {
+        // If over the limit, keep only the first 6
+        return combined.slice(0, 6);
+      }
+      return combined;
+    });
   };
 
   return (
@@ -216,9 +224,13 @@ const Comment = ({
                         accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
                       />
                       <Button
-                        onClick={() =>
-                          document.getElementById("reply-file-input").click()
-                        }
+                        onClick={() => {
+                          if (replyAttachments.length >= 6) {
+                            alert("Maximum 6 files allowed per reply");
+                            return;
+                          }
+                          document.getElementById("reply-file-input").click();
+                        }}
                         sx={{
                           minWidth: "36px",
                           width: "36px",
@@ -263,8 +275,8 @@ const Comment = ({
                     <Box
                       key={index}
                       sx={{
-                        width: "50px",
-                        height: "50px",
+                        width: "40px",
+                        height: "40px",
                         position: "relative",
                         borderRadius: "4px",
                         overflow: "hidden",

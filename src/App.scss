@@ -13,6 +13,10 @@
       color: white !important;
     }
   }
+
+  > div {
+    max-width: 100%;
+  }
 }
 
 .App-logo {

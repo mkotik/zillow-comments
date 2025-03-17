@@ -10,24 +10,28 @@ const s3 = new AWS.S3({
   endpoint: process.env.B2_ENDPOINT,
   accessKeyId: process.env.B2_KEY_ID,
   secretAccessKey: process.env.B2_APP_KEY,
-  region: process.env.B2_REGION,
   s3ForcePathStyle: true,
   signatureVersion: "v4",
 });
 
-// Test connection to Backblaze
-s3.listBuckets((err, data) => {
-  if (err) {
-    console.error("Error connecting to Backblaze B2:", err);
-  } else {
+// Test connection to Backblaze on startup
+console.log("Testing Backblaze B2 connection...");
+s3.listBuckets()
+  .promise()
+  .then((data) => {
     console.log(
-      "Successfully connected to Backblaze B2, available buckets:",
+      "Successfully connected to Backblaze B2:",
       data.Buckets.map((b) => b.Name)
     );
-  }
-});
+  })
+  .catch((err) => {
+    console.error("Error connecting to Backblaze B2:", err);
+    throw new Error(
+      "Failed to connect to Backblaze B2 - uploads will not work"
+    );
+  });
 
-// Configure upload middleware with Backblaze B2
+// Configure upload middleware with Backblaze B2 only (no local fallback)
 const upload = multer({
   storage: multerS3({
     s3: s3,
@@ -64,9 +68,9 @@ const upload = multer({
       );
     }
   },
-}).array("attachments", 5); // Allow up to 5 attachments per comment
+}).array("attachments", 6); // Allow up to 6 attachments per comment
 
-// Handle file uploads
+// Handle file uploads - Backblaze only
 exports.uploadFiles = (req, res) => {
   console.log("Upload to Backblaze request received");
 
@@ -86,7 +90,7 @@ exports.uploadFiles = (req, res) => {
     try {
       // Format attachment data for storage in MongoDB
       const attachments = req.files.map((file) => {
-        console.log("Processing uploaded file:", file);
+        console.log("Processing uploaded file from Backblaze:", file);
 
         return {
           url: file.location, // S3/Backblaze URL

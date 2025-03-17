@@ -89,7 +89,15 @@ const CommentPage = () => {
   };
 
   const handleUploadComplete = (uploadedAttachments) => {
-    setAttachments((prev) => [...prev, ...uploadedAttachments]);
+    setAttachments((prev) => {
+      // Limit to 6 files total
+      const combined = [...prev, ...uploadedAttachments];
+      if (combined.length > 6) {
+        // If over the limit, keep only the first 6
+        return combined.slice(0, 6);
+      }
+      return combined;
+    });
   };
 
   return (
@@ -166,7 +174,10 @@ const CommentPage = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "row" },
+            "@media (max-width: 400px)": {
+              flexDirection: "column",
+            },
             gap: "10px",
             width: "100%",
             alignItems: "stretch",
@@ -249,9 +260,13 @@ const CommentPage = () => {
                       accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
                     />
                     <Button
-                      onClick={() =>
-                        document.getElementById("comment-file-input").click()
-                      }
+                      onClick={() => {
+                        if (attachments.length >= 6) {
+                          alert("Maximum 6 files allowed per comment");
+                          return;
+                        }
+                        document.getElementById("comment-file-input").click();
+                      }}
                       sx={{
                         minWidth: "36px",
                         width: "36px",
@@ -298,8 +313,8 @@ const CommentPage = () => {
                   <Box
                     key={index}
                     sx={{
-                      width: "50px",
-                      height: "50px",
+                      width: "40px",
+                      height: "40px",
                       position: "relative",
                       borderRadius: "4px",
                       overflow: "hidden",
