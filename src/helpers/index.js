@@ -11,9 +11,9 @@ export const parseAddress = (url) => {
 };
 
 export const getBaseUrl = () => {
-  // return process.env.NODE_ENV === "production"
-  //   ? process.env.REACT_APP_API_URL_PROD
-  //   : process.env.REACT_APP_API_URL_LOCAL;
+  return process.env.NODE_ENV === "production"
+    ? process.env.REACT_APP_API_URL_PROD
+    : process.env.REACT_APP_API_URL_LOCAL;
   return "https://zillow-comments-production.up.railway.app";
 };
 
