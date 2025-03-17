@@ -101,15 +101,24 @@ const Comment = ({
           sx={{
             mt: 2,
             display: "flex",
-            alignItems: "center",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "flex-start" },
             marginBottom: "20px",
             gap: "10px",
           }}
         >
-          <Box sx={{ position: "relative", width: "100%" }}>
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              flexGrow: 1,
+            }}
+          >
             <TextField
               className="comment-input reply-comment-input"
               fullWidth
+              multiline
+              rows={2}
               variant="outlined"
               placeholder="Your Reply"
               value={replyContent}
@@ -124,27 +133,40 @@ const Comment = ({
                   handleReplySubmit(e);
                 }
               }}
-              sx={{ mb: 1 }}
+              sx={{
+                mb: 1,
+              }}
             />
-            <span className="char-limit">
-              {replyContent.length}/{MAX_REPLY_LENGTH}
-            </span>
           </Box>
-          <Button
-            variant="contained"
-            onClick={handleReplySubmit}
-            sx={{
-              width: 200,
-              display: "flex",
-              gap: 1,
-              paddingLeft: 0,
-              paddingRight: 0,
-            }}
-            className="general-button"
-          >
-            <ChatIcon />
-            Submit
-          </Button>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+            <Button
+              variant="contained"
+              onClick={handleReplySubmit}
+              sx={{
+                minWidth: { xs: "100%", sm: "120px" },
+                height: { sm: "56px" },
+                display: "flex",
+                gap: 1,
+                justifyContent: "center",
+              }}
+              className="general-button"
+            >
+              <ChatIcon />
+              Submit
+            </Button>
+            <Typography
+              variant="caption"
+              sx={{
+                textAlign: "center",
+                color:
+                  replyContent.length >= MAX_REPLY_LENGTH
+                    ? "#ff6b6b"
+                    : "inherit",
+              }}
+            >
+              {replyContent.length}/{MAX_REPLY_LENGTH} characters
+            </Typography>
+          </Box>
         </Box>
       )}
       {replies &&

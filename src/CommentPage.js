@@ -142,52 +142,75 @@ const CommentPage = () => {
             </Button>
           </Box>
         )}
-        <Box sx={{ position: "relative", width: "100%" }}>
-          <TextField
-            fullWidth
-            placeholder="Your Comment"
-            className="comment-input"
-            variant="outlined"
-            multiline
-            rows={4}
-            value={comment}
-            onChange={(e) => {
-              if (e.target.value.length <= MAX_COMMENT_LENGTH) {
-                setComment(e.target.value);
-              }
-            }}
-            InputLabelProps={{ shrink: false }}
-            sx={{ "& legend": { display: "none" }, "& fieldset": { top: 0 } }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
-          <span className="char-limit">
-            {comment.length}/{MAX_COMMENT_LENGTH}
-          </span>
-        </Box>
-        <Button
-          className="comment-button general-button"
-          type="submit"
-          variant="contained"
-          fullWidth
+        <Box
           sx={{
-            gap: 1,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-            "&:hover": {
-              backgroundColor: "#2a934a !important",
-            },
+            flexDirection: { xs: "column", sm: "row" },
+            gap: "10px",
+            width: "100%",
+            alignItems: { xs: "stretch", sm: "flex-start" },
           }}
         >
-          <ChatIcon />
-          Post Comment
-        </Button>
+          <Box sx={{ position: "relative", width: "100%", flexGrow: 1 }}>
+            <TextField
+              fullWidth
+              placeholder="Your Comment"
+              className="comment-input"
+              variant="outlined"
+              multiline
+              rows={4}
+              value={comment}
+              onChange={(e) => {
+                if (e.target.value.length <= MAX_COMMENT_LENGTH) {
+                  setComment(e.target.value);
+                }
+              }}
+              InputLabelProps={{ shrink: false }}
+              sx={{
+                "& legend": { display: "none" },
+                "& fieldset": { top: 0 },
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
+          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+            <Button
+              className="comment-button general-button"
+              type="submit"
+              variant="contained"
+              sx={{
+                minWidth: { xs: "100%", sm: "180px" },
+                height: { sm: "100px" },
+                gap: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#2a934a !important",
+                },
+              }}
+            >
+              <ChatIcon />
+              Post Comment
+            </Button>
+            <Typography
+              variant="caption"
+              sx={{
+                textAlign: "center",
+                color:
+                  comment.length >= MAX_COMMENT_LENGTH ? "#ff6b6b" : "inherit",
+              }}
+            >
+              {comment.length}/{MAX_COMMENT_LENGTH} characters
+            </Typography>
+          </Box>
+        </Box>
       </form>
 
       {comments.map((comment, index) => (
