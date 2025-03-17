@@ -10,7 +10,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
-import logoWithText from "./assets/logo-w-text.png";
 
 const MAX_COMMENT_LENGTH = 400;
 const MAX_NAME_LENGTH = 30;
