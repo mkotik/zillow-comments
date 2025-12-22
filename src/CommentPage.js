@@ -7,15 +7,18 @@ import {
   Box,
   Divider,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import Comment from "./Comment";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { parseAddress, getBaseUrl } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import Cookies from "js-cookie";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
+import LogoutIcon from "@mui/icons-material/Logout";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -25,12 +28,14 @@ import TableChartIcon from "@mui/icons-material/TableChart";
 import { generateAnonName } from "./helpers";
 import { useForceRerender } from "./hooks/useForceRerender";
 import AttachmentPreview from "./AttachmentPreview";
+import api, { authStorage } from "./api/client";
 
 const MAX_COMMENT_LENGTH = 400;
 const MAX_NAME_LENGTH = 30;
 
 const CommentPage = () => {
   const forceRerender = useForceRerender();
+  const navigate = useNavigate();
   const [name, setName] = useState(
     Cookies.get("name") ? Cookies.get("name") : ""
   );
@@ -100,8 +105,35 @@ const CommentPage = () => {
     });
   };
 
+  const handleSignOut = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (e) {
+      // ignore
+    } finally {
+      authStorage.clearAll();
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pb: 1,
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}></Typography>
+        <Tooltip title="Sign out">
+          <IconButton onClick={handleSignOut} size="small">
+            <LogoutIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Divider sx={{ mb: 2 }} />
       <form onSubmit={handleSubmit} className="comment-form">
         {Cookies.get("name") ? (
           <Box

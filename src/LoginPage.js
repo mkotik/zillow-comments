@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   Paper,
   TextField,
@@ -61,11 +62,11 @@ const LoginPage = () => {
       if (user) authStorage.setUser(user);
       if (mode === "signup") {
         setSuccessMsg("Account created! Redirecting...");
-        setSuccessOpen(true);
-        redirectAfterAuth(true);
       } else {
-        redirectAfterAuth(false);
+        setSuccessMsg("Logged in! Redirecting...");
       }
+      setSuccessOpen(true);
+      redirectAfterAuth(true);
     } catch (err) {
       console.error("Auth error:", err);
       setError(err.response?.data?.message || "Authentication failed");
@@ -130,7 +131,13 @@ const LoginPage = () => {
             className="general-button"
             disabled={loading}
           >
-            {mode === "signup" ? "Sign up" : "Log in"}
+            {loading ? (
+              <CircularProgress size={20} sx={{ color: "white" }} />
+            ) : mode === "signup" ? (
+              "Sign up"
+            ) : (
+              "Log in"
+            )}
           </Button>
         </Box>
 
@@ -139,13 +146,17 @@ const LoginPage = () => {
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Login
             mode={mode}
+            onAuthStart={() => setLoading(true)}
+            onAuthEnd={() => setLoading(false)}
             onAuthSuccess={() => {
               if (mode === "signup") {
                 setSuccessMsg("Account created with Google! Redirecting...");
                 setSuccessOpen(true);
                 redirectAfterAuth(true);
               } else {
-                redirectAfterAuth(false);
+                setSuccessMsg("Logged in with Google! Redirecting...");
+                setSuccessOpen(true);
+                redirectAfterAuth(true);
               }
             }}
           />
