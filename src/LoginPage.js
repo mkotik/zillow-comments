@@ -130,13 +130,23 @@ const LoginPage = () => {
             variant="contained"
             className="general-button"
             disabled={loading}
+            sx={{ minHeight: 48, position: "relative" }}
           >
-            {loading ? (
-              <CircularProgress size={20} sx={{ color: "white" }} />
-            ) : mode === "signup" ? (
-              "Sign up"
-            ) : (
-              "Log in"
+            <span style={{ visibility: loading ? "hidden" : "visible" }}>
+              {mode === "signup" ? "Sign up" : "Log in"}
+            </span>
+            {loading && (
+              <CircularProgress
+                size={20}
+                sx={{
+                  color: "white",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-10px",
+                  marginLeft: "-10px",
+                }}
+              />
             )}
           </Button>
         </Box>
