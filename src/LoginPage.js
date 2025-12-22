@@ -8,6 +8,8 @@ import {
   Paper,
   TextField,
   Typography,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Login from "./Login";
 import api, { authStorage } from "./api/client";
@@ -29,10 +31,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const redirectAfterAuth = () => {
+  const redirectAfterAuth = (withDelay = false) => {
     const from = location.state?.from?.pathname || "/";
-    navigate(from, { replace: true });
+    if (!withDelay) {
+      navigate(from, { replace: true });
+      return;
+    }
+    setTimeout(() => navigate(from, { replace: true }), 950);
   };
 
   const handleLocalAuth = async (e) => {
@@ -51,7 +59,13 @@ const LoginPage = () => {
       const { accessToken, user } = res.data || {};
       if (accessToken) authStorage.setAccessToken(accessToken);
       if (user) authStorage.setUser(user);
-      redirectAfterAuth();
+      if (mode === "signup") {
+        setSuccessMsg("Account created! Redirecting...");
+        setSuccessOpen(true);
+        redirectAfterAuth(true);
+      } else {
+        redirectAfterAuth(false);
+      }
     } catch (err) {
       console.error("Auth error:", err);
       setError(err.response?.data?.message || "Authentication failed");
@@ -124,11 +138,29 @@ const LoginPage = () => {
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Login
+            mode={mode}
             onAuthSuccess={() => {
-              redirectAfterAuth();
+              if (mode === "signup") {
+                setSuccessMsg("Account created with Google! Redirecting...");
+                setSuccessOpen(true);
+                redirectAfterAuth(true);
+              } else {
+                redirectAfterAuth(false);
+              }
             }}
           />
         </Box>
+
+        <Snackbar
+          open={successOpen}
+          autoHideDuration={950}
+          onClose={() => setSuccessOpen(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert severity="success" onClose={() => setSuccessOpen(false)}>
+            {successMsg}
+          </Alert>
+        </Snackbar>
 
         <Box sx={{ mt: 2, textAlign: "center" }}>
           {mode === "signup" ? (

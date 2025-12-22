@@ -1,9 +1,10 @@
 import { GoogleLogin } from "@react-oauth/google";
 import api, { authStorage } from "./api/client";
 
-const Login = ({ onAuthSuccess }) => {
+const Login = ({ mode = "login", onAuthSuccess }) => {
   return (
     <GoogleLogin
+      text={mode === "signup" ? "signup_with" : "signin_with"}
       onSuccess={async (credentialResponse) => {
         try {
           const idToken = credentialResponse?.credential;

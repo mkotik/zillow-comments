@@ -52,7 +52,9 @@ exports.signup = async (req, res) => {
     const name = String(req.body.name || "").trim();
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
     if (password.length < 8) {
       return res
@@ -86,15 +88,19 @@ exports.login = async (req, res) => {
     const password = String(req.body.password || "");
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email });
+    console.log("user found", user);
     if (!user || !user.passwordHash) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
+    console.log("ok", ok);
     if (!ok) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -219,5 +225,3 @@ exports.me = async (req, res) => {
     return res.status(500).json({ message: "Failed to load user" });
   }
 };
-
-
