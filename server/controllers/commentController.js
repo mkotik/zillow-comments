@@ -1,5 +1,6 @@
 const Comment = require("../models/Comment");
 const ReplyComment = require("../models/ReplyComment");
+const User = require("../models/User");
 const { v4: uuidv4 } = require("uuid");
 
 exports.getCommentsByAddressFromDB = async (address) => {
@@ -60,6 +61,15 @@ exports.getCommentsByAddressFromDB = async (address) => {
 exports.createComment = async (req, res) => {
   console.log("Creating comment with data:", req.body);
 
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(401).json({ message: "Invalid user" });
+  }
+
   // Ensure attachments is always an array, even if not provided
   const attachments = req.body.attachments || [];
   console.log("Comment attachments:", attachments);
@@ -67,7 +77,8 @@ exports.createComment = async (req, res) => {
   const newComment = new Comment({
     id: uuidv4(),
     address: req.body.address,
-    name: req.body.name,
+    userId: user._id,
+    name: user.name || user.email,
     content: req.body.content,
     attachments: attachments,
     date: req.body.date || Date.now(),

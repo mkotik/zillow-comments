@@ -54,3 +54,23 @@ export const formatTimestamp = (dateString) => {
     });
   }
 };
+
+export const formatDisplayName = (fullNameOrEmail = "") => {
+  const raw = String(fullNameOrEmail || "").trim();
+
+  if (!raw) return "User";
+
+  // If it's an email and no name, show local-part
+  if (raw.includes("@") && !raw.includes(" ")) {
+    return raw.split("@")[0] || "User";
+  }
+
+  const parts = raw.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "User";
+  if (parts.length === 1) return parts[0];
+
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  const lastInitial = last?.[0] ? `${last[0].toUpperCase()}.` : "";
+  return `${first} ${lastInitial}`.trim();
+};

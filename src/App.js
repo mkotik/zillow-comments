@@ -5,7 +5,7 @@ import BasePage from "./BasePage";
 import LoginPage from "./LoginPage";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
-// import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
@@ -17,25 +17,25 @@ function App() {
             <Route
               path="/homedetails/*"
               element={
-                // <ProtectedRoute>
-                <CommentPage />
-                // </ProtectedRoute>
+                <ProtectedRoute>
+                  <CommentPage />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/b/*"
               element={
-                // <ProtectedRoute>
-                <CommentPage />
-                // </ProtectedRoute>
+                <ProtectedRoute>
+                  <CommentPage />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/*"
               element={
-                // <ProtectedRoute>
-                <BasePage />
-                // </ProtectedRoute>
+                <ProtectedRoute>
+                  <BasePage />
+                </ProtectedRoute>
               }
             />
           </Routes>

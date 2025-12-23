@@ -96,6 +96,11 @@
   font-weight: bold !important;
 }
 
+.general-button.Mui-disabled {
+  background-color: #6b7280 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
 .chat-icon {
   width: 20px;
   height: 20px;
@@ -166,6 +171,22 @@
       display: flex;
     }
   }
+}
+
+/* Prevent Chrome autofill from turning inputs white (dark theme) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+.MuiInputBase-input:-webkit-autofill,
+.MuiInputBase-input:-webkit-autofill:hover,
+.MuiInputBase-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1f2a37 inset !important;
+  transition: background-color 9999s ease-out 0s;
 }
 
 .reply-comment-input {

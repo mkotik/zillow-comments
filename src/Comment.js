@@ -9,8 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ReplyComment from "./ReplyComment";
-import { getBaseUrl } from "./helpers";
-import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { parseAddress } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
@@ -20,11 +18,10 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
-import { generateAnonName } from "./helpers";
-import Cookies from "js-cookie";
-import { useForceRerender } from "./hooks/useForceRerender";
+import { formatDisplayName } from "./helpers";
 import { formatTimestamp } from "./helpers";
 import AttachmentPreview from "./AttachmentPreview";
+import api from "./api/client";
 
 const MAX_REPLY_LENGTH = 200;
 
@@ -36,10 +33,8 @@ const Comment = ({
   attachments,
   id,
   setComments,
-  setName,
-  activeName,
 }) => {
-  const forceRerender = useForceRerender();
+  const displayName = formatDisplayName(name);
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [replyAttachments, setReplyAttachments] = useState([]);
@@ -50,29 +45,9 @@ const Comment = ({
     e.preventDefault();
     if (!replyContent.trim() && replyAttachments.length === 0) return;
 
-    let currentName = activeName;
-    if (currentName.trim() === "") {
-      currentName = Cookies.get("name");
-    } else {
-      Cookies.set("name", currentName, {
-        sameSite: "None",
-        secure: true,
-      });
-      forceRerender();
-    }
-    if (!currentName) {
-      currentName = generateAnonName();
-      Cookies.set("name", currentName, {
-        sameSite: "None",
-        secure: true,
-      });
-      setName(currentName);
-    }
     try {
-      const baseUrl = getBaseUrl();
-      const response = await axios.post(`${baseUrl}/replycomments`, {
+      const response = await api.post(`/replycomments`, {
         address: parseAddress(location.pathname),
-        name: currentName,
         content: replyContent,
         attachments: replyAttachments,
         parentCommentId: id,
@@ -110,8 +85,8 @@ const Comment = ({
       className="comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1 }}>{name[0]}</Avatar>
-        <Typography variant="subtitle1">{name}</Typography>
+        <Avatar sx={{ mr: 1 }}>{(displayName && displayName[0]) || "?"}</Avatar>
+        <Typography variant="subtitle1">{displayName}</Typography>
         <Typography variant="caption" sx={{ ml: "auto" }}>
           {formatTimestamp(date)}
         </Typography>
@@ -281,9 +256,8 @@ const Comment = ({
                         formData.append("attachments", file);
                       });
 
-                      const baseUrl = getBaseUrl();
-                      const response = await axios.post(
-                        `${baseUrl}/files/upload`,
+                      const response = await api.post(
+                        `/files/upload`,
                         formData,
                         {
                           headers: {
@@ -347,9 +321,8 @@ const Comment = ({
                                 formData.append("attachments", file);
                               });
 
-                              const baseUrl = getBaseUrl();
-                              const response = await axios.post(
-                                `${baseUrl}/files/upload`,
+                              const response = await api.post(
+                                `/files/upload`,
                                 formData,
                                 {
                                   headers: {

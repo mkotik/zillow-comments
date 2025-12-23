@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const replyCommentController = require("../controllers/replyCommentController");
+const { requireAuth } = require("../middleware/requireAuth");
 
-router.post("/", replyCommentController.createReplyComment);
+router.post("/", requireAuth, replyCommentController.createReplyComment);
 
 module.exports = router;
