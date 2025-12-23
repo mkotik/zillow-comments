@@ -22,24 +22,37 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-const rawOrigins =
-  process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:3000";
+const defaultOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://zillow-comments.com", "https://www.zillow-comments.com"]
+    : ["http://localhost:3000"];
+
+const rawOrigins = process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "";
 const allowedOrigins = rawOrigins
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+const effectiveAllowedOrigins =
+  allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins;
+
+console.log("CORS allowlist:", effectiveAllowedOrigins);
 
 app.use(
   cors({
     origin: (origin, cb) => {
       // Allow non-browser clients (no Origin header)
       if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked origin: ${origin}`));
+      if (effectiveAllowedOrigins.includes(origin)) return cb(null, true);
+      console.warn(`CORS blocked origin: ${origin}`);
+      return cb(null, false);
     },
     credentials: true,
   })
 );
+
+// Ensure preflight requests get CORS headers
+app.options("*", cors({ origin: true, credentials: true }));
 
 // Connect to MongoDB
 connectDB();
