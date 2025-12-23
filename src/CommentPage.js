@@ -12,12 +12,8 @@ import {
 } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { parseAddress, getBaseUrl } from "./helpers";
+import { parseAddress, formatDisplayName } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
-import Cookies from "js-cookie";
-import EditIcon from "@mui/icons-material/Edit";
-import DoneIcon from "@mui/icons-material/Done";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -25,32 +21,24 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
-import { generateAnonName } from "./helpers";
-import { useForceRerender } from "./hooks/useForceRerender";
-import AttachmentPreview from "./AttachmentPreview";
 import api, { authStorage } from "./api/client";
 
 const MAX_COMMENT_LENGTH = 400;
-const MAX_NAME_LENGTH = 30;
 
 const CommentPage = () => {
-  const forceRerender = useForceRerender();
   const navigate = useNavigate();
-  const [name, setName] = useState(
-    Cookies.get("name") ? Cookies.get("name") : ""
-  );
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const location = useLocation();
+  const currentUser = authStorage.getUser();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const baseUrl = getBaseUrl();
         const address = parseAddress(location.pathname);
-        const response = await axios.get(`${baseUrl}/comments`, {
+        const response = await api.get(`/comments`, {
           params: { address },
         });
         console.log("Fetched comments:", response.data);
@@ -67,17 +55,9 @@ const CommentPage = () => {
     e.preventDefault();
     if (!comment.trim() && attachments.length === 0) return;
 
-    const anonymousName = generateAnonName();
-    console.log(name);
-    Cookies.set("name", name.trim() === "" ? anonymousName : name.trim(), {
-      sameSite: "None",
-      secure: true,
-    });
     try {
-      const baseUrl = getBaseUrl();
-      const response = await axios.post(`${baseUrl}/comments`, {
+      const response = await api.post(`/comments`, {
         address: parseAddress(location.pathname),
-        name: name.trim() === "" ? anonymousName : name.trim(),
         content: comment,
         attachments: attachments,
         date: new Date().toISOString(),
@@ -85,7 +65,6 @@ const CommentPage = () => {
 
       console.log("Comment submitted:", response.data);
       setComments(response.data);
-      setName(Cookies.get("name") || "");
       setComment("");
       setAttachments([]);
     } catch (error) {
@@ -126,7 +105,10 @@ const CommentPage = () => {
           pb: 1,
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}></Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          Signed in as{" "}
+          {formatDisplayName(currentUser?.name || currentUser?.email || "User")}
+        </Typography>
         <Tooltip title="Sign out">
           <IconButton onClick={handleSignOut} size="small">
             <LogoutIcon />
@@ -135,74 +117,6 @@ const CommentPage = () => {
       </Box>
       <Divider sx={{ mb: 2 }} />
       <form onSubmit={handleSubmit} className="comment-form">
-        {Cookies.get("name") ? (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              height: "57.5px",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography sx={{ fontWeight: "bold" }}>Name: </Typography>
-              <Typography>{Cookies.get("name")}</Typography>
-            </Box>
-            <Button
-              className="general-button"
-              sx={{ height: "57.5px" }}
-              onClick={() => {
-                Cookies.remove("name", {
-                  sameSite: "None",
-                  secure: true,
-                });
-                setName("");
-              }}
-            >
-              <EditIcon />
-            </Button>
-          </Box>
-        ) : (
-          <Box sx={{ display: "flex", width: "100%", gap: "10px" }}>
-            <TextField
-              fullWidth
-              placeholder="Your Name (Optional)"
-              className="comment-input"
-              variant="outlined"
-              value={name}
-              onChange={(e) => {
-                if (e.target.value.length <= MAX_NAME_LENGTH) {
-                  setName(e.target.value);
-                }
-              }}
-              InputLabelProps={{ shrink: false }}
-              sx={{
-                "& legend": { display: "none" },
-                "& fieldset": { top: 0 },
-              }}
-            />
-            <Button
-              className="general-button"
-              onClick={() => {
-                let newName;
-                if (name.trim() === "") {
-                  newName = generateAnonName();
-                } else {
-                  newName = name.trim();
-                }
-                Cookies.set("name", newName, {
-                  sameSite: "None",
-                  secure: true,
-                });
-                setName(newName);
-                forceRerender();
-              }}
-            >
-              <DoneIcon />
-            </Button>
-          </Box>
-        )}
         <Box
           sx={{
             display: "flex",
@@ -289,9 +203,8 @@ const CommentPage = () => {
                         formData.append("attachments", file);
                       });
 
-                      const baseUrl = getBaseUrl();
-                      const response = await axios.post(
-                        `${baseUrl}/files/upload`,
+                      const response = await api.post(
+                        `/files/upload`,
                         formData,
                         {
                           headers: {
@@ -355,9 +268,8 @@ const CommentPage = () => {
                                 formData.append("attachments", file);
                               });
 
-                              const baseUrl = getBaseUrl();
-                              const response = await axios.post(
-                                `${baseUrl}/files/upload`,
+                              const response = await api.post(
+                                `/files/upload`,
                                 formData,
                                 {
                                   headers: {
@@ -545,9 +457,7 @@ const CommentPage = () => {
 
       {comments.map((comment, index) => (
         <Comment
-          setName={setName}
           key={index}
-          activeName={name}
           name={comment.name}
           content={comment.content}
           date={comment.date}

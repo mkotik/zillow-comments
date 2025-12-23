@@ -1,12 +1,13 @@
 import React from "react";
 import { Box, Typography, Avatar } from "@mui/material";
-import { formatTimestamp } from "./helpers";
+import { formatTimestamp, formatDisplayName } from "./helpers";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 const ReplyComment = ({ name, content, attachments, date }) => {
+  const displayName = formatDisplayName(name);
   return (
     <Box
       sx={{
@@ -17,8 +18,10 @@ const ReplyComment = ({ name, content, attachments, date }) => {
       className="reply-comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1, width: 30, height: 30 }}>{name[0]}</Avatar>
-        <Typography variant="subtitle2">{name}</Typography>
+        <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+          {(displayName && displayName[0]) || "?"}
+        </Avatar>
+        <Typography variant="subtitle2">{displayName}</Typography>
         <Typography variant="caption" sx={{ ml: "auto" }}>
           {formatTimestamp(date)}
         </Typography>
