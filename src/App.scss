@@ -96,6 +96,11 @@
   font-weight: bold !important;
 }
 
+.general-button.Mui-disabled {
+  background-color: #6b7280 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
 .chat-icon {
   width: 20px;
   height: 20px;

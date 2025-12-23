@@ -11,6 +11,7 @@ import {
   Typography,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import Login from "./Login";
 import api, { authStorage } from "./api/client";
@@ -27,13 +28,60 @@ const LoginPage = () => {
   }, []);
 
   const [mode, setMode] = useState("login"); // login | signup
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [confirmTouched, setConfirmTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+
+  const isSignup = mode === "signup";
+
+  const validate = () => {
+    const next = {};
+
+    if (isSignup) {
+      if (!firstName.trim()) next.firstName = "First name is required";
+      if (!lastName.trim()) next.lastName = "Last name is required";
+    }
+
+    if (!email.trim()) next.email = "Email is required";
+    if (!password) next.password = "Password is required";
+
+    if (isSignup) {
+      if (!confirmPassword)
+        next.confirmPassword = "Confirm password is required";
+      if (password && confirmPassword && password !== confirmPassword) {
+        next.confirmPassword = "Passwords do not match";
+      }
+    }
+
+    return next;
+  };
+
+  const isSubmitDisabled = () => {
+    if (loading) return true;
+    const errs = validate();
+    return Object.keys(errs).length > 0;
+  };
+
+  const getSignupFixTooltip = () => {
+    if (!isSignup) return "";
+    const errs = validate();
+    const messages = [];
+    if (errs.firstName) messages.push(errs.firstName);
+    if (errs.lastName) messages.push(errs.lastName);
+    if (errs.email) messages.push(errs.email);
+    if (errs.password) messages.push(errs.password);
+    if (errs.confirmPassword) messages.push(errs.confirmPassword);
+    if (messages.length === 0) return "";
+    return `Fix the following fields: ${messages.join(", ")}`;
+  };
 
   const redirectAfterAuth = (withDelay = false) => {
     const from = location.state?.from?.pathname || "/";
@@ -47,12 +95,19 @@ const LoginPage = () => {
   const handleLocalAuth = async (e) => {
     e.preventDefault();
     setError("");
+    const errs = validate();
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     setLoading(true);
 
     try {
       const payload =
         mode === "signup"
-          ? { name: name.trim(), email: email.trim(), password }
+          ? {
+              name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+              email: email.trim(),
+              password,
+            }
           : { email: email.trim(), password };
 
       const path = mode === "signup" ? "/auth/signup" : "/auth/login";
@@ -87,37 +142,119 @@ const LoginPage = () => {
           onSubmit={handleLocalAuth}
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          {mode === "signup" && (
-            <TextField
-              label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-              fullWidth
-            />
+          {isSignup && (
+            <>
+              <div style={{ display: "flex", gap: 10 }}>
+                <TextField
+                  label="First name"
+                  value={firstName}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      firstName: undefined,
+                    }));
+                  }}
+                  autoComplete="given-name"
+                  fullWidth
+                  required
+                />
+                <TextField
+                  label="Last name"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      lastName: undefined,
+                    }));
+                  }}
+                  autoComplete="family-name"
+                  fullWidth
+                  required
+                />
+              </div>
+            </>
           )}
 
           <TextField
             label="Email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete={mode === "signup" ? "email" : "username"}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setFieldErrors((prev) => ({ ...prev, email: undefined }));
+            }}
+            autoComplete={isSignup ? "email" : "username"}
             fullWidth
             required
+            error={Boolean(fieldErrors.email)}
           />
 
           <TextField
             label="Password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={
-              mode === "signup" ? "new-password" : "current-password"
-            }
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                password: undefined,
+                confirmPassword: undefined,
+              }));
+            }}
+            autoComplete={isSignup ? "new-password" : "current-password"}
             fullWidth
             required
+            error={Boolean(fieldErrors.password)}
           />
+
+          {isSignup && (
+            <TextField
+              label="Confirm password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setFieldErrors((prev) => ({
+                  ...prev,
+                  confirmPassword: undefined,
+                }));
+              }}
+              onBlur={() => {
+                setConfirmTouched(true);
+                if (
+                  password &&
+                  confirmPassword &&
+                  password !== confirmPassword
+                ) {
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    confirmPassword: "Passwords do not match",
+                  }));
+                }
+              }}
+              autoComplete="new-password"
+              fullWidth
+              required
+              error={
+                Boolean(fieldErrors.confirmPassword) ||
+                (confirmTouched &&
+                  password &&
+                  confirmPassword &&
+                  password !== confirmPassword)
+              }
+              helperText={
+                fieldErrors.confirmPassword ||
+                (confirmTouched &&
+                password &&
+                confirmPassword &&
+                password !== confirmPassword
+                  ? "Passwords do not match"
+                  : " ")
+              }
+            />
+          )}
 
           {error && (
             <Typography variant="body2" color="error">
@@ -125,30 +262,38 @@ const LoginPage = () => {
             </Typography>
           )}
 
-          <Button
-            type="submit"
-            variant="contained"
-            className="general-button"
-            disabled={loading}
-            sx={{ minHeight: 48, position: "relative" }}
+          <Tooltip
+            title={isSignup && isSubmitDisabled() ? getSignupFixTooltip() : ""}
+            arrow
+            disableHoverListener={!(isSignup && isSubmitDisabled())}
           >
-            <span style={{ visibility: loading ? "hidden" : "visible" }}>
-              {mode === "signup" ? "Sign up" : "Log in"}
+            <span style={{ width: "100%" }}>
+              <Button
+                type="submit"
+                variant="contained"
+                className="general-button"
+                disabled={isSubmitDisabled()}
+                sx={{ minHeight: 48, position: "relative", width: "100%" }}
+              >
+                <span style={{ visibility: loading ? "hidden" : "visible" }}>
+                  {isSignup ? "Sign up" : "Log in"}
+                </span>
+                {loading && (
+                  <CircularProgress
+                    size={20}
+                    sx={{
+                      color: "white",
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      marginTop: "-10px",
+                      marginLeft: "-10px",
+                    }}
+                  />
+                )}
+              </Button>
             </span>
-            {loading && (
-              <CircularProgress
-                size={20}
-                sx={{
-                  color: "white",
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  marginTop: "-10px",
-                  marginLeft: "-10px",
-                }}
-              />
-            )}
-          </Button>
+          </Tooltip>
         </Box>
 
         <Divider sx={{ my: 2 }}>or</Divider>
@@ -187,14 +332,34 @@ const LoginPage = () => {
           {mode === "signup" ? (
             <Typography variant="body2">
               Already have an account?{" "}
-              <Button variant="text" onClick={() => setMode("login")}>
+              <Button
+                variant="text"
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                  setFieldErrors({});
+                  setPassword("");
+                  setConfirmPassword("");
+                  setConfirmTouched(false);
+                }}
+              >
                 Log in
               </Button>
             </Typography>
           ) : (
             <Typography variant="body2">
               Don&apos;t have an account?{" "}
-              <Button variant="text" onClick={() => setMode("signup")}>
+              <Button
+                variant="text"
+                onClick={() => {
+                  setMode("signup");
+                  setError("");
+                  setFieldErrors({});
+                  setPassword("");
+                  setConfirmPassword("");
+                  setConfirmTouched(false);
+                }}
+              >
                 Sign up
               </Button>
             </Typography>
