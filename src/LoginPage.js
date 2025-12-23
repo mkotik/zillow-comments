@@ -21,10 +21,7 @@ const LoginPage = () => {
   const location = useLocation();
 
   const clientId = useMemo(() => {
-    return (
-      process.env.REACT_APP_GOOGLE_CLIENT_ID ||
-      "799754948352-a71ejo3j4aaj2duhh0opvq0tjsglj5va.apps.googleusercontent.com"
-    );
+    return process.env.REACT_APP_GOOGLE_CLIENT_ID;
   }, []);
 
   const [mode, setMode] = useState("login"); // login | signup
