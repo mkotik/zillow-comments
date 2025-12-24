@@ -152,7 +152,7 @@ const Comment = ({
                     <DescriptionIcon sx={{ color: "#2196f3" }} />
                   ) : attachment.contentType?.includes("excel") ||
                     attachment.contentType?.includes("sheet") ? (
-                    <TableChartIcon sx={{ color: "#4caf50" }} />
+                    <TableChartIcon sx={{ color: "#006aff" }} />
                   ) : (
                     <InsertDriveFileIcon sx={{ color: "#757575" }} />
                   )}
@@ -444,7 +444,7 @@ const Comment = ({
                           <DescriptionIcon sx={{ color: "#2196f3" }} />
                         ) : attachment.contentType.includes("excel") ||
                           attachment.contentType.includes("sheet") ? (
-                          <TableChartIcon sx={{ color: "#4caf50" }} />
+                          <TableChartIcon sx={{ color: "#006aff" }} />
                         ) : (
                           <InsertDriveFileIcon sx={{ color: "#757575" }} />
                         )}

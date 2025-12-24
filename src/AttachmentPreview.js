@@ -56,7 +56,7 @@ const AttachmentPreview = ({ attachments }) => {
           contentType.includes("spreadsheet"))) ||
       ["xls", "xlsx", "csv"].includes(extension)
     ) {
-      return <TableChartIcon sx={{ fontSize: 32, color: "#4caf50" }} />;
+      return <TableChartIcon sx={{ fontSize: 32, color: "#006aff" }} />;
     } else {
       return <InsertDriveFileIcon sx={{ fontSize: 32, color: "#757575" }} />;
     }

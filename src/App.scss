@@ -90,7 +90,7 @@
     hsla(0, 0%, 100%, 0.15),
     hsla(0, 0%, 100%, 0)
   );
-  background-color: #2ea44f !important;
+  background-color: #006aff !important;
   box-shadow: 0 1px 1px rgba(18, 21, 26, 0.075);
   color: white !important;
   font-weight: bold !important;
@@ -128,13 +128,13 @@
       background-color: #374251;
     }
     fieldset {
-      border-color: #2ea44f !important;
+      border-color: #006aff !important;
     }
   }
 
   :hover {
     fieldset {
-      border-color: #2ea44f !important;
+      border-color: #006aff !important;
     }
   }
 
@@ -146,8 +146,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(46, 164, 79, 0.2);
-    border: 2px dashed #2ea44f;
+    background-color: rgba(0, 106, 255, 0.2);
+    border: 2px dashed #006aff;
     align-items: center;
     justify-content: center;
     z-index: 10;
@@ -165,7 +165,7 @@
   }
 
   &.drag-over {
-    border-color: #2ea44f !important;
+    border-color: #006aff !important;
 
     .drag-overlay {
       display: flex;

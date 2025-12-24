@@ -387,7 +387,7 @@ const CommentPage = () => {
                           <DescriptionIcon sx={{ color: "#2196f3" }} />
                         ) : attachment.contentType.includes("excel") ||
                           attachment.contentType.includes("sheet") ? (
-                          <TableChartIcon sx={{ color: "#4caf50" }} />
+                          <TableChartIcon sx={{ color: "#006aff" }} />
                         ) : (
                           <InsertDriveFileIcon sx={{ color: "#757575" }} />
                         )}
@@ -444,7 +444,7 @@ const CommentPage = () => {
                 fontWeight: "bold",
                 width: { xs: "100%", sm: "auto" },
                 "&:hover": {
-                  backgroundColor: "#2a934a !important",
+                  backgroundColor: "#005ce0 !important",
                 },
               }}
             >
