@@ -22,6 +22,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import api, { authStorage } from "./api/client";
+import { useZillowUrlState } from "./hooks/useZillowUrlState";
 
 const MAX_COMMENT_LENGTH = 400;
 
@@ -33,11 +34,15 @@ const CommentPage = () => {
   const [uploading, setUploading] = useState(false);
   const location = useLocation();
   const currentUser = authStorage.getUser();
+  const zillowUrlState = useZillowUrlState();
+
+  const addressSource = zillowUrlState?.pathname || zillowUrlState?.href || "";
+  const address = parseAddress(addressSource);
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const address = parseAddress(location.pathname);
+        if (!address) return;
         const response = await api.get(`/comments`, {
           params: { address },
         });
@@ -49,15 +54,16 @@ const CommentPage = () => {
     };
 
     fetchComments();
-  }, [location.pathname]);
+  }, [address]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim() && attachments.length === 0) return;
+    if (!address) return;
 
     try {
       const response = await api.post(`/comments`, {
-        address: parseAddress(location.pathname),
+        address,
         content: comment,
         attachments: attachments,
         date: new Date().toISOString(),
@@ -116,6 +122,22 @@ const CommentPage = () => {
         </Tooltip>
       </Box>
       <Divider sx={{ mb: 2 }} />
+
+      {!address && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            Waiting for Zillow URL…
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+            This iframe uses the parent Zillow page URL to decide which home
+            comments to load.
+          </Typography>
+          <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
+            href: {zillowUrlState?.href || "(not received yet)"}
+          </Typography>
+        </Box>
+      )}
+
       <form onSubmit={handleSubmit} className="comment-form">
         <Box
           sx={{
@@ -145,6 +167,7 @@ const CommentPage = () => {
                   setComment(e.target.value);
                 }
               }}
+              disabled={!address}
               InputLabelProps={{ shrink: false }}
               sx={{
                 "& legend": { display: "none" },
@@ -296,12 +319,14 @@ const CommentPage = () => {
                     />
                     <Button
                       onClick={() => {
+                        if (!address) return;
                         if (attachments.length >= 6) {
                           alert("Maximum 6 files allowed per comment");
                           return;
                         }
                         document.getElementById("comment-file-input").click();
                       }}
+                      disabled={!address}
                       sx={{
                         minWidth: "36px",
                         width: "36px",
@@ -433,7 +458,7 @@ const CommentPage = () => {
               className="comment-button general-button"
               type="submit"
               variant="contained"
-              disabled={!comment.trim() && attachments.length === 0}
+              disabled={!address || (!comment.trim() && attachments.length === 0)}
               sx={{
                 minWidth: { sm: "180px" },
                 height: { xs: "50px", sm: "100px" },

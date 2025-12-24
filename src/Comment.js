@@ -9,7 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ReplyComment from "./ReplyComment";
-import { useLocation } from "react-router-dom";
 import { parseAddress } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
@@ -22,6 +21,7 @@ import { formatDisplayName } from "./helpers";
 import { formatTimestamp } from "./helpers";
 import AttachmentPreview from "./AttachmentPreview";
 import api from "./api/client";
+import { useZillowUrlState } from "./hooks/useZillowUrlState";
 
 const MAX_REPLY_LENGTH = 200;
 
@@ -39,15 +39,18 @@ const Comment = ({
   const [replyContent, setReplyContent] = useState("");
   const [replyAttachments, setReplyAttachments] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const location = useLocation();
+  const zillowUrlState = useZillowUrlState();
+  const addressSource = zillowUrlState?.pathname || zillowUrlState?.href || "";
+  const address = parseAddress(addressSource);
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
     if (!replyContent.trim() && replyAttachments.length === 0) return;
+    if (!address) return;
 
     try {
       const response = await api.post(`/replycomments`, {
-        address: parseAddress(location.pathname),
+        address,
         content: replyContent,
         attachments: replyAttachments,
         parentCommentId: id,
