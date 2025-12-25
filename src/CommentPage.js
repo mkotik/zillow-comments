@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { parseAddress, formatDisplayName, formatZillowAddressLabel } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -114,11 +115,22 @@ const CommentPage = ({ zillowUrlState }) => {
           Signed in as{" "}
           {formatDisplayName(currentUser?.name || currentUser?.email || "User")}
         </Typography>
-        <Tooltip title="Sign out">
-          <IconButton onClick={handleSignOut} size="small">
-            <LogoutIcon />
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Tooltip title="Settings">
+            <IconButton
+              onClick={() => navigate("/settings", { state: { from: location } })}
+              size="small"
+              aria-label="Settings"
+            >
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Sign out">
+            <IconButton onClick={handleSignOut} size="small" aria-label="Sign out">
+              <LogoutIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
       <Divider sx={{ mb: 2 }} />
 
