@@ -22,7 +22,8 @@ function publicUser(user) {
     id: String(user._id),
     email: user.email,
     name: user.name || "",
-    picture: user.picture || "",
+    picture: user.profilePictureUrl || user.picture || "",
+    profilePictureUrl: user.profilePictureUrl || "",
   };
 }
 
@@ -223,5 +224,39 @@ exports.me = async (req, res) => {
   } catch (err) {
     console.error("Me error:", err);
     return res.status(500).json({ message: "Failed to load user" });
+  }
+};
+
+exports.updateMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { profilePictureUrl } = req.body || {};
+
+    if (profilePictureUrl !== undefined) {
+      if (typeof profilePictureUrl !== "string") {
+        return res
+          .status(400)
+          .json({ message: "profilePictureUrl must be a string" });
+      }
+
+      const trimmed = profilePictureUrl.trim();
+
+      // allow clearing with ""
+      if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+        return res
+          .status(400)
+          .json({ message: "profilePictureUrl must be a valid URL" });
+      }
+
+      user.profilePictureUrl = trimmed;
+    }
+
+    await user.save();
+    return res.status(200).json({ user: publicUser(user) });
+  } catch (err) {
+    console.error("updateMe error:", err);
+    return res.status(500).json({ message: "Failed to update user" });
   }
 };

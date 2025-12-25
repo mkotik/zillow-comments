@@ -19,6 +19,7 @@ router.post("/google", authLimiter, authController.google);
 router.post("/refresh", authController.refresh);
 router.post("/logout", authController.logout);
 router.get("/me", requireAuth, authController.me);
+router.patch("/me", requireAuth, authController.updateMe);
 
 module.exports = router;
 
