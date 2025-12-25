@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { parseAddress, formatDisplayName } from "./helpers";
+import { parseAddress, formatDisplayName, formatZillowAddressLabel } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
@@ -38,6 +38,7 @@ const CommentPage = () => {
 
   const addressSource = zillowUrlState?.pathname || zillowUrlState?.href || "";
   const address = parseAddress(addressSource);
+  const addressLabel = formatZillowAddressLabel(addressSource);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -133,7 +134,7 @@ const CommentPage = () => {
             comments to load.
           </Typography>
           <Typography variant="caption" sx={{ display: "block", mt: 1 }}>
-            href: {zillowUrlState?.href || "(not received yet)"}
+            {addressLabel || "(not received yet)"}
           </Typography>
         </Box>
       )}

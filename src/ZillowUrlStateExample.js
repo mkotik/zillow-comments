@@ -1,8 +1,12 @@
 import React from "react";
 import { useZillowUrlState } from "./hooks/useZillowUrlState";
+import { formatZillowAddressLabel } from "./helpers";
 
 export default function ZillowUrlStateExample() {
   const zillowUrlState = useZillowUrlState();
+  const label = formatZillowAddressLabel(
+    zillowUrlState?.href || zillowUrlState?.pathname || ""
+  );
 
   return (
     <div
@@ -13,10 +17,8 @@ export default function ZillowUrlStateExample() {
         opacity: 0.9,
       }}
     >
-      <div style={{ fontWeight: 700, marginBottom: 4 }}>Zillow URL state</div>
-      <div>
-        <span style={{ opacity: 0.7 }}>href: </span>
-        <span>{zillowUrlState?.href || "(waiting for postMessage...)"}</span>
+      <div style={{ fontWeight: 700 }}>
+        {label || "(waiting for Zillow URL...)"}
       </div>
     </div>
   );
