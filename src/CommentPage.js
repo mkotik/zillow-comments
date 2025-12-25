@@ -22,11 +22,10 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import api, { authStorage } from "./api/client";
-import { useZillowUrlState } from "./hooks/useZillowUrlState";
 
 const MAX_COMMENT_LENGTH = 400;
 
-const CommentPage = () => {
+const CommentPage = ({ zillowUrlState }) => {
   const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -34,7 +33,6 @@ const CommentPage = () => {
   const [uploading, setUploading] = useState(false);
   const location = useLocation();
   const currentUser = authStorage.getUser();
-  const zillowUrlState = useZillowUrlState();
 
   const addressSource = zillowUrlState?.pathname || zillowUrlState?.href || "";
   const address = parseAddress(addressSource);
@@ -490,6 +488,7 @@ const CommentPage = () => {
           id={comment.id}
           replies={comment.replies}
           attachments={comment.attachments}
+          address={address}
           setComments={setComments}
         />
       ))}

@@ -1,9 +1,7 @@
 import React from "react";
-import { useZillowUrlState } from "./hooks/useZillowUrlState";
 import { formatZillowAddressLabel } from "./helpers";
 
-export default function ZillowUrlStateExample() {
-  const zillowUrlState = useZillowUrlState();
+export default function ZillowUrlStateExample({ zillowUrlState }) {
   const label = formatZillowAddressLabel(
     zillowUrlState?.href || zillowUrlState?.pathname || ""
   );

@@ -7,20 +7,23 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import ProtectedRoute from "./ProtectedRoute";
 import ZillowUrlStateExample from "./ZillowUrlStateExample";
+import { useZillowUrlState } from "./hooks/useZillowUrlState";
 
 function App() {
+  const zillowUrlState = useZillowUrlState();
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
         <div className="App">
-          <ZillowUrlStateExample />
+          <ZillowUrlStateExample zillowUrlState={zillowUrlState} />
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/comments"
               element={
                 <ProtectedRoute>
-                  <CommentPage />
+                  <CommentPage zillowUrlState={zillowUrlState} />
                 </ProtectedRoute>
               }
             />

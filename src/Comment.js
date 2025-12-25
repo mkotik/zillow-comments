@@ -9,7 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ReplyComment from "./ReplyComment";
-import { parseAddress } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -21,7 +20,6 @@ import { formatDisplayName } from "./helpers";
 import { formatTimestamp } from "./helpers";
 import AttachmentPreview from "./AttachmentPreview";
 import api from "./api/client";
-import { useZillowUrlState } from "./hooks/useZillowUrlState";
 
 const MAX_REPLY_LENGTH = 200;
 
@@ -32,6 +30,7 @@ const Comment = ({
   replies,
   attachments,
   id,
+  address,
   setComments,
 }) => {
   const displayName = formatDisplayName(name);
@@ -39,9 +38,6 @@ const Comment = ({
   const [replyContent, setReplyContent] = useState("");
   const [replyAttachments, setReplyAttachments] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const zillowUrlState = useZillowUrlState();
-  const addressSource = zillowUrlState?.pathname || zillowUrlState?.href || "";
-  const address = parseAddress(addressSource);
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();

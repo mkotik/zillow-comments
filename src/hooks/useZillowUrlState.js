@@ -46,13 +46,18 @@ export function useZillowUrlState() {
         console.log("[ZILLOW_URL_STATE] meta:", { reason, ts });
       }
 
-      setState({
-        href,
-        pathname: typeof pathname === "string" ? pathname : "",
-        search: typeof search === "string" ? search : "",
-        hash: typeof hash === "string" ? hash : "",
-        ts,
-        reason,
+      setState((prev) => {
+        // Dedupe: avoid re-rendering if Zillow sends the same href repeatedly
+        if (prev && prev.href === href) return prev;
+
+        return {
+          href,
+          pathname: typeof pathname === "string" ? pathname : "",
+          search: typeof search === "string" ? search : "",
+          hash: typeof hash === "string" ? hash : "",
+          ts,
+          reason,
+        };
       });
     };
 
