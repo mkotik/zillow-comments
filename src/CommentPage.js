@@ -514,6 +514,7 @@ const CommentPage = ({ zillowUrlState }) => {
         <Comment
           key={index}
           name={comment.name}
+          picture={comment.picture}
           content={comment.content}
           date={comment.date}
           id={comment.id}

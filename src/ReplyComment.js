@@ -6,7 +6,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
-const ReplyComment = ({ name, content, attachments, date }) => {
+const ReplyComment = ({ name, picture, content, attachments, date }) => {
   const displayName = formatDisplayName(name);
   return (
     <Box
@@ -18,7 +18,14 @@ const ReplyComment = ({ name, content, attachments, date }) => {
       className="reply-comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+        <Avatar
+          sx={{ mr: 1, width: 30, height: 30 }}
+          src={picture || undefined}
+          imgProps={{
+            style: { objectFit: "cover" },
+            referrerPolicy: "no-referrer",
+          }}
+        >
           {(displayName && displayName[0]) || "?"}
         </Avatar>
         <Typography variant="subtitle2">{displayName}</Typography>

@@ -25,6 +25,7 @@ const MAX_REPLY_LENGTH = 200;
 
 const Comment = ({
   name,
+  picture,
   content,
   date,
   replies,
@@ -84,7 +85,16 @@ const Comment = ({
       className="comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1 }}>{(displayName && displayName[0]) || "?"}</Avatar>
+        <Avatar
+          sx={{ mr: 1 }}
+          src={picture || undefined}
+          imgProps={{
+            style: { objectFit: "cover" },
+            referrerPolicy: "no-referrer",
+          }}
+        >
+          {(displayName && displayName[0]) || "?"}
+        </Avatar>
         <Typography variant="subtitle1">{displayName}</Typography>
         <Typography variant="caption" sx={{ ml: "auto" }}>
           {formatTimestamp(date)}
@@ -514,6 +524,7 @@ const Comment = ({
           <ReplyComment
             key={reply.id}
             name={reply.name}
+            picture={reply.picture}
             content={reply.content}
             attachments={reply.attachments}
             date={reply.date}

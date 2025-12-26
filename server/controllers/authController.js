@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const RefreshToken = require("../models/RefreshToken");
 const { verifyGoogleIdToken } = require("../utils/google");
+const { effectiveUserPicture } = require("../utils/userPicture");
 const {
   signAccessToken,
   generateRefreshToken,
@@ -20,10 +21,7 @@ function normalizeEmail(email) {
 function publicUser(user) {
   const profilePictureUrl = user.profilePictureUrl || "";
   const profilePictureHidden = !!user.profilePictureHidden;
-  const googlePicture = user.picture || "";
-  const effectivePicture = profilePictureHidden
-    ? ""
-    : profilePictureUrl || googlePicture;
+  const effectivePicture = effectiveUserPicture(user);
 
   return {
     id: String(user._id),
