@@ -19,8 +19,8 @@ const PrivacyPolicyPage = () => {
       <Divider sx={{ mb: 2 }} />
 
       <Typography variant="body1" sx={{ mb: 2 }}>
-        This Privacy Policy explains how this app (“we”, “us”) collects, uses,
-        and shares information when you use the Service.
+        This Privacy Policy explains how House Humblr (“we”, “us”) collects,
+        uses, and shares information when you use House Humblr (the “Service”).
       </Typography>
 
       <Typography variant="h6" sx={{ fontWeight: 800, mt: 3, mb: 1 }}>
