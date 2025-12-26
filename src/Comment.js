@@ -205,7 +205,12 @@ const Comment = ({
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                // Enter should create a newline; Cmd/Ctrl+Enter submits.
+                // Avoid interfering with IME composition.
+                if (e.isComposing) return;
+                const isSubmitChord =
+                  e.key === "Enter" && (e.metaKey || e.ctrlKey);
+                if (isSubmitChord) {
                   e.preventDefault();
                   handleReplySubmit(e);
                 }
