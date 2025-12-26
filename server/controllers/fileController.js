@@ -17,7 +17,7 @@ const s3 = new AWS.S3({
 });
 
 // Configure upload middleware for initial file processing
-const upload = multer({
+const uploadAttachments = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit initially to allow for compression
@@ -42,9 +42,25 @@ const upload = multer({
   },
 }).array("attachments", 6); // Allow up to 6 attachments per comment
 
+const uploadProfile = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max original profile picture size
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+      return cb(new Error("Profile picture must be an image"));
+    }
+    return cb(null, true);
+  },
+}).array("attachments", 1); // Profile picture: exactly one file
+
 // Handle file uploads with image compression
 exports.uploadFiles = (req, res) => {
   console.log("Upload to Backblaze request received");
+
+  const isProfile = String(req.query?.purpose || "") === "profile";
+  const upload = isProfile ? uploadProfile : uploadAttachments;
 
   upload(req, res, async function (err) {
     if (err) {
@@ -70,9 +86,26 @@ exports.uploadFiles = (req, res) => {
         const isImage = file.mimetype.startsWith("image/");
         let processedBuffer = file.buffer;
         let contentType = file.mimetype;
+        let ext = path.extname(file.originalname);
 
-        // Compress images that are over 1MB
-        if (isImage && file.size > 1 * 1024 * 1024) {
+        if (isProfile) {
+          // Always normalize profile pictures: square crop + jpeg compress
+          try {
+            console.log(`Normalizing profile image: ${file.originalname}`);
+            processedBuffer = await sharp(file.buffer)
+              .resize({ width: 512, height: 512, fit: "cover" })
+              .jpeg({ quality: 82 })
+              .toBuffer();
+            contentType = "image/jpeg";
+            ext = ".jpg";
+          } catch (compressionError) {
+            console.error(
+              `Error processing profile image: ${compressionError.message}`
+            );
+            return res.status(400).json({ error: "Invalid profile image" });
+          }
+        } else if (isImage && file.size > 1 * 1024 * 1024) {
+          // Compress attachment images that are over 1MB
           try {
             console.log(`Compressing image: ${file.originalname}`);
 
@@ -104,7 +137,8 @@ exports.uploadFiles = (req, res) => {
         }
 
         // Generate a unique filename
-        const fileName = `${uuidv4()}${path.extname(file.originalname)}`;
+        const prefix = isProfile ? "profilePictures" : "commentAttachments";
+        const fileName = `${prefix}/${uuidv4()}${ext}`;
 
         // Upload to Backblaze B2
         const uploadParams = {
@@ -152,9 +186,26 @@ exports.deleteFile = async (req, res) => {
       return res.status(400).json({ error: "File URL is required" });
     }
 
-    // Extract key from the file URL
-    const urlParts = fileUrl.split("/");
-    const key = urlParts[urlParts.length - 1];
+    // Extract key from the file URL (including folder/prefix)
+    let key = "";
+    try {
+      const u = new URL(fileUrl);
+      key = String(u.pathname || "").replace(/^\/+/, "");
+    } catch (_) {
+      key = String(fileUrl || "").replace(/^https?:\/\/[^/]+\//i, "");
+    }
+
+    // Backblaze S3 URL format often includes bucket name in the path: /<bucket>/<key>
+    const bucket = String(process.env.B2_BUCKET_NAME || "");
+    if (bucket && key.startsWith(`${bucket}/`)) {
+      key = key.slice(bucket.length + 1);
+    }
+
+    // Safety guard: only allow deletes within our managed prefixes
+    const allowed = ["profilePictures/", "commentAttachments/"];
+    if (!allowed.some((p) => key.startsWith(p))) {
+      return res.status(400).json({ error: "Invalid file key" });
+    }
 
     console.log(`Attempting to delete file from Backblaze B2: ${key}`);
 
@@ -171,11 +222,9 @@ exports.deleteFile = async (req, res) => {
       .json({ message: "File deleted successfully from Backblaze B2" });
   } catch (error) {
     console.error("Error deleting file from Backblaze B2:", error);
-    res
-      .status(500)
-      .json({
-        error: "Failed to delete file from Backblaze B2",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to delete file from Backblaze B2",
+      details: error.message,
+    });
   }
 };

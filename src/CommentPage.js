@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Paper,
   Typography,
   TextField,
   Button,
@@ -12,8 +11,13 @@ import {
 } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { parseAddress, formatDisplayName, formatZillowAddressLabel } from "./helpers";
+import {
+  parseAddress,
+  formatDisplayName,
+  formatZillowAddressLabel,
+} from "./helpers";
 import ChatIcon from "./assets/chatIcon";
+import AnonymousIcon from "./assets/anonymousIcon";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
@@ -102,7 +106,13 @@ const CommentPage = ({ zillowUrlState }) => {
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
+    <Box
+      sx={{
+        p: 2,
+        maxWidth: 600,
+        mx: "auto",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -114,11 +124,49 @@ const CommentPage = ({ zillowUrlState }) => {
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           Signed in as{" "}
           {formatDisplayName(currentUser?.name || currentUser?.email || "User")}
+          {currentUser?.anonymousMode && (
+            <Tooltip title="Anonymous mode" placement="top">
+              <Box
+                component="span"
+                tabIndex={0}
+                aria-label="Anonymous mode"
+                sx={{
+                  ml: 0.5,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  verticalAlign: "middle",
+                  lineHeight: 0,
+                  color: "rgba(229,231,235,0.9)",
+                  borderRadius: "999px",
+                  px: 0.75,
+                  py: 0.25,
+                  backgroundColor: "transparent",
+                  border: "1px solid transparent",
+                  transition:
+                    "background-color 160ms ease, border-color 160ms ease, transform 120ms ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,106,255,0.12)",
+                    borderColor: "rgba(0,106,255,0.35)",
+                  },
+                  "&:active": { transform: "translateY(1px)" },
+                  "&:focus-visible": {
+                    outline: "2px solid rgba(0,106,255,0.85)",
+                    outlineOffset: "2px",
+                  },
+                }}
+              >
+                <AnonymousIcon size={16} />
+              </Box>
+            </Tooltip>
+          )}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <Tooltip title="Settings">
             <IconButton
-              onClick={() => navigate("/settings", { state: { from: location } })}
+              onClick={() =>
+                navigate("/settings", { state: { from: location } })
+              }
               size="small"
               aria-label="Settings"
             >
@@ -126,7 +174,11 @@ const CommentPage = ({ zillowUrlState }) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Sign out">
-            <IconButton onClick={handleSignOut} size="small" aria-label="Sign out">
+            <IconButton
+              onClick={handleSignOut}
+              size="small"
+              aria-label="Sign out"
+            >
               <LogoutIcon />
             </IconButton>
           </Tooltip>
@@ -153,12 +205,8 @@ const CommentPage = ({ zillowUrlState }) => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "row" },
-            justifyContent: "center",
-            "@media (max-width: 400px)": {
-              flexDirection: "column",
-              justifyContent: "flex-start !important",
-            },
+            flexDirection: "column",
+            justifyContent: "flex-start",
             gap: "10px",
             width: "100%",
             alignItems: "stretch",
@@ -186,10 +234,13 @@ const CommentPage = ({ zillowUrlState }) => {
                 position: "relative", // Ensure position is relative for overlay
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
+                // Enter inserts a newline (native textarea behavior).
+                // Cmd/Ctrl+Enter submits.
+                // Avoid interfering with IME composition.
+                if (e.isComposing) return;
+                if (!(e.key === "Enter" && (e.metaKey || e.ctrlKey))) return;
+                e.preventDefault();
+                handleSubmit(e);
               }}
               // Use dragenter instead of dragover for less frequent events
               onDragEnter={(e) => {
@@ -361,13 +412,19 @@ const CommentPage = ({ zillowUrlState }) => {
               sx={{
                 display: "block",
                 textAlign: "right",
-                mt: 0.5,
+                mt: 1,
                 color:
                   comment.length >= MAX_COMMENT_LENGTH ? "#ff6b6b" : "inherit",
               }}
             >
               {comment.length}/{MAX_COMMENT_LENGTH} characters
             </Typography>
+            {/* <Typography
+              variant="caption"
+              sx={{ display: "block", textAlign: "right", opacity: 0.8 }}
+            >
+              Cmd/Ctrl+Enter to post
+            </Typography> */}
 
             {/* Attachment previews below the text input */}
             {attachments.length > 0 && (
@@ -466,10 +523,12 @@ const CommentPage = ({ zillowUrlState }) => {
             }}
           >
             <Button
-              className="comment-button general-button"
+              className="comment-button"
               type="submit"
               variant="contained"
-              disabled={!address || (!comment.trim() && attachments.length === 0)}
+              disabled={
+                !address || (!comment.trim() && attachments.length === 0)
+              }
               sx={{
                 minWidth: { sm: "180px" },
                 height: { xs: "50px", sm: "100px" },
@@ -478,10 +537,7 @@ const CommentPage = ({ zillowUrlState }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "bold",
-                width: { xs: "100%", sm: "auto" },
-                "&:hover": {
-                  backgroundColor: "#005ce0 !important",
-                },
+                width: "100% !important",
               }}
             >
               <ChatIcon />
@@ -495,6 +551,7 @@ const CommentPage = ({ zillowUrlState }) => {
         <Comment
           key={index}
           name={comment.name}
+          picture={comment.picture}
           content={comment.content}
           date={comment.date}
           id={comment.id}
@@ -504,7 +561,7 @@ const CommentPage = ({ zillowUrlState }) => {
           setComments={setComments}
         />
       ))}
-    </Paper>
+    </Box>
   );
 };
 

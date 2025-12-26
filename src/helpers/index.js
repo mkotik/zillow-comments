@@ -153,10 +153,13 @@ export const formatZillowAddressLabel = (urlOrPath = "") => {
 };
 
 export const getBaseUrl = () => {
-  return process.env.NODE_ENV === "production"
-    ? process.env.REACT_APP_API_URL_PROD
-    : process.env.REACT_APP_API_URL_LOCAL;
-  return "https://zillow-comments-production.up.railway.app";
+  if (process.env.NODE_ENV === "production") {
+    return process.env.REACT_APP_API_URL_PROD;
+  }
+
+  // Local development. Prefer explicit env var, otherwise fall back to the default
+  // server port used in local dev for this repo.
+  return process.env.REACT_APP_API_URL_LOCAL || "http://localhost:6500";
 };
 
 export const generateAnonName = () => {

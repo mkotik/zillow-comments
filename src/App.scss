@@ -2,19 +2,14 @@
   text-align: center;
   margin: 0;
   background: transparent;
-  > div,
+  color: #e5e7eb;
+
   input,
   textarea {
-    color: white !important;
+    color: #e5e7eb !important;
     margin: 0;
     background: transparent;
     box-shadow: none;
-    label {
-      color: white !important;
-    }
-    > div {
-      max-width: 100%;
-    }
   }
 }
 
@@ -59,9 +54,6 @@
   border-radius: 5px;
   p {
     text-align: left;
-  }
-  button {
-    float: left;
   }
 }
 
@@ -108,14 +100,21 @@
 
 .comment-input {
   margin-bottom: 2;
-  background-color: #1f2a37;
-  border: 1px solid #4b5663 !important;
-  border-radius: 5px;
   position: relative;
   transition: all 0.3s ease;
 
   .MuiInputBase-root {
     padding: 0px !important;
+  }
+
+  /* Ensure border radius is applied to the actual outlined input + outline */
+  .MuiOutlinedInput-root {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  fieldset {
+    border-radius: 14px;
   }
 
   textarea {
@@ -152,7 +151,7 @@
     justify-content: center;
     z-index: 10;
     pointer-events: none;
-    border-radius: 4px;
+    border-radius: 14px;
     transition: all 0.3s ease;
   }
 
@@ -196,8 +195,71 @@ textarea:-webkit-autofill:focus,
 }
 
 .comment-content,
+.reply-content,
 .reply-comment-content {
   hyphens: auto;
+  white-space: pre-wrap; /* preserve newlines + sequences of spaces */
+  overflow-wrap: anywhere; /* prevent long unbroken strings from overflowing */
+}
+
+/* Expandable text (comments/replies) */
+.expandable-text {
+  text-align: left;
+}
+
+.expandable-text__content {
+  /* Keep rendering stable regardless of clamp state */
+  margin: 0;
+}
+
+.expandable-text__content--collapsed {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--expandable-lines, 5);
+  line-clamp: var(--expandable-lines, 5);
+  overflow: hidden;
+}
+
+/* Subtle fade at the bottom when collapsed (doesn't depend on background color) */
+.expandable-text__content--faded {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+
+.expandable-text__toggle {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+
+  color: #9cc3ff;
+  background: rgba(0, 106, 255, 0.12);
+  border: 1px solid rgba(0, 106, 255, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+
+  transition: background-color 160ms ease, border-color 160ms ease,
+    transform 120ms ease, color 160ms ease;
+}
+
+.expandable-text__toggle:hover {
+  color: #dbeafe;
+  background: rgba(0, 106, 255, 0.18);
+  border-color: rgba(0, 106, 255, 0.5);
+}
+
+.expandable-text__toggle:active {
+  transform: translateY(1px);
+}
+
+.expandable-text__toggle:focus-visible {
+  outline: 2px solid rgba(0, 106, 255, 0.85);
+  outline-offset: 2px;
 }
 
 /* File upload styles */

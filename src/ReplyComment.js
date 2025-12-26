@@ -5,8 +5,9 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import ExpandableText from "./ExpandableText";
 
-const ReplyComment = ({ name, content, attachments, date }) => {
+const ReplyComment = ({ name, picture, content, attachments, date }) => {
   const displayName = formatDisplayName(name);
   return (
     <Box
@@ -18,7 +19,14 @@ const ReplyComment = ({ name, content, attachments, date }) => {
       className="reply-comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+        <Avatar
+          sx={{ mr: 1, width: 30, height: 30 }}
+          src={picture || undefined}
+          imgProps={{
+            style: { objectFit: "cover" },
+            referrerPolicy: "no-referrer",
+          }}
+        >
           {(displayName && displayName[0]) || "?"}
         </Avatar>
         <Typography variant="subtitle2">{displayName}</Typography>
@@ -26,9 +34,14 @@ const ReplyComment = ({ name, content, attachments, date }) => {
           {formatTimestamp(date)}
         </Typography>
       </Box>
-      <Typography className="reply-content" variant="body2" sx={{ mb: 1 }}>
-        {content}
-      </Typography>
+      <Box sx={{ mb: 1 }}>
+        <ExpandableText
+          text={content}
+          lines={5}
+          variant="body2"
+          contentClassName="reply-content"
+        />
+      </Box>
 
       {/* Display attachments if any */}
       {attachments && attachments.length > 0 && (

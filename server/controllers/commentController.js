@@ -1,6 +1,7 @@
 const Comment = require("../models/Comment");
 const ReplyComment = require("../models/ReplyComment");
 const User = require("../models/User");
+const { effectiveUserPicture } = require("../utils/userPicture");
 const { v4: uuidv4 } = require("uuid");
 
 exports.getCommentsByAddressFromDB = async (address) => {
@@ -30,9 +31,25 @@ exports.getCommentsByAddressFromDB = async (address) => {
     console.log("Sample reply attachments:", replyComments[0].attachments);
   }
 
+  // Build a map of userId -> effective picture, so avatars always reflect the current user profile picture
+  const userIds = new Set();
+  comments.forEach((c) => c.userId && userIds.add(String(c.userId)));
+  replyComments.forEach((r) => r.userId && userIds.add(String(r.userId)));
+
+  const users = await User.find({ _id: { $in: Array.from(userIds) } })
+    .select("_id picture profilePictureUrl profilePictureHidden")
+    .lean();
+
+  const userPictureById = new Map(
+    users.map((u) => [String(u._id), effectiveUserPicture(u)])
+  );
+
   // Create a map of comments with their replies
   const commentMap = comments.reduce((acc, comment) => {
-    acc[comment.id] = { ...comment.toObject(), replies: [] };
+    const obj = comment.toObject();
+    const uid = obj.userId ? String(obj.userId) : "";
+    obj.picture = uid ? userPictureById.get(uid) || "" : "";
+    acc[comment.id] = { ...obj, replies: [] };
     return acc;
   }, {});
 
@@ -41,6 +58,8 @@ exports.getCommentsByAddressFromDB = async (address) => {
     if (commentMap[reply.parentCommentId]) {
       // Convert to object to ensure all fields are included
       const replyObject = reply.toObject();
+      const uid = replyObject.userId ? String(replyObject.userId) : "";
+      replyObject.picture = uid ? userPictureById.get(uid) || "" : "";
       console.log(
         `Adding reply to comment ${reply.parentCommentId}, has attachments: ${
           replyObject.attachments?.length || 0
@@ -74,11 +93,15 @@ exports.createComment = async (req, res) => {
   const attachments = req.body.attachments || [];
   console.log("Comment attachments:", attachments);
 
+  const commentAuthorName = user.anonymousMode
+    ? user.anonymousUsername || "Anonymous"
+    : user.name || user.email;
+
   const newComment = new Comment({
     id: uuidv4(),
     address: req.body.address,
     userId: user._id,
-    name: user.name || user.email,
+    name: commentAuthorName,
     content: req.body.content,
     attachments: attachments,
     date: req.body.date || Date.now(),

@@ -9,6 +9,7 @@ import CommentPage from "./CommentPage";
 import BasePage from "./BasePage";
 import LoginPage from "./LoginPage";
 import { ThemeProvider } from "@mui/material/styles";
+import { CssBaseline } from "@mui/material";
 import theme from "./theme";
 import ProtectedRoute from "./ProtectedRoute";
 import { useZillowUrlState } from "./hooks/useZillowUrlState";
@@ -19,6 +20,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Router>
         <div className="App">
           <Routes>

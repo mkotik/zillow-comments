@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const RefreshToken = require("../models/RefreshToken");
 const { verifyGoogleIdToken } = require("../utils/google");
+const { effectiveUserPicture } = require("../utils/userPicture");
 const {
   signAccessToken,
   generateRefreshToken,
@@ -18,11 +19,19 @@ function normalizeEmail(email) {
 }
 
 function publicUser(user) {
+  const profilePictureUrl = user.profilePictureUrl || "";
+  const profilePictureHidden = !!user.profilePictureHidden;
+  const effectivePicture = effectiveUserPicture(user);
+
   return {
     id: String(user._id),
     email: user.email,
     name: user.name || "",
-    picture: user.picture || "",
+    picture: effectivePicture,
+    profilePictureUrl,
+    profilePictureHidden,
+    anonymousMode: !!user.anonymousMode,
+    anonymousUsername: user.anonymousUsername || "",
   };
 }
 
@@ -223,5 +232,98 @@ exports.me = async (req, res) => {
   } catch (err) {
     console.error("Me error:", err);
     return res.status(500).json({ message: "Failed to load user" });
+  }
+};
+
+exports.updateMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const {
+      profilePictureUrl,
+      profilePictureHidden,
+      anonymousMode,
+      anonymousUsername,
+    } = req.body || {};
+
+    if (profilePictureHidden !== undefined) {
+      if (typeof profilePictureHidden !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "profilePictureHidden must be a boolean" });
+      }
+      user.profilePictureHidden = profilePictureHidden;
+    }
+
+    if (profilePictureUrl !== undefined) {
+      if (typeof profilePictureUrl !== "string") {
+        return res
+          .status(400)
+          .json({ message: "profilePictureUrl must be a string" });
+      }
+
+      const trimmed = profilePictureUrl.trim();
+
+      // allow clearing with ""
+      if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+        return res
+          .status(400)
+          .json({ message: "profilePictureUrl must be a valid URL" });
+      }
+
+      user.profilePictureUrl = trimmed;
+
+      // If a custom URL is being set, it always becomes visible.
+      if (trimmed) user.profilePictureHidden = false;
+    }
+
+    if (anonymousMode !== undefined) {
+      if (typeof anonymousMode !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "anonymousMode must be a boolean" });
+      }
+      user.anonymousMode = anonymousMode;
+    }
+
+    if (anonymousUsername !== undefined) {
+      if (typeof anonymousUsername !== "string") {
+        return res
+          .status(400)
+          .json({ message: "anonymousUsername must be a string" });
+      }
+
+      const trimmed = anonymousUsername.trim();
+
+      // allow clearing with ""
+      if (trimmed) {
+        if (trimmed.length < 3 || trimmed.length > 32) {
+          return res
+            .status(400)
+            .json({ message: "anonymousUsername must be 3–32 characters" });
+        }
+        if (!/^[A-Za-z0-9_-]+$/.test(trimmed)) {
+          return res.status(400).json({
+            message:
+              "anonymousUsername may contain only letters, numbers, underscores, and dashes",
+          });
+        }
+      }
+
+      user.anonymousUsername = trimmed;
+    }
+
+    if (user.anonymousMode && !user.anonymousUsername) {
+      return res.status(400).json({
+        message: "anonymousUsername is required when anonymousMode is enabled",
+      });
+    }
+
+    await user.save();
+    return res.status(200).json({ user: publicUser(user) });
+  } catch (err) {
+    console.error("updateMe error:", err);
+    return res.status(500).json({ message: "Failed to update user" });
   }
 };

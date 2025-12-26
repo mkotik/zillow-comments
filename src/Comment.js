@@ -9,6 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ReplyComment from "./ReplyComment";
+import ExpandableText from "./ExpandableText";
 import ChatIcon from "./assets/chatIcon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -25,6 +26,7 @@ const MAX_REPLY_LENGTH = 200;
 
 const Comment = ({
   name,
+  picture,
   content,
   date,
   replies,
@@ -84,16 +86,28 @@ const Comment = ({
       className="comment"
     >
       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Avatar sx={{ mr: 1 }}>{(displayName && displayName[0]) || "?"}</Avatar>
+        <Avatar
+          sx={{ mr: 1 }}
+          src={picture || undefined}
+          imgProps={{
+            style: { objectFit: "cover" },
+            referrerPolicy: "no-referrer",
+          }}
+        >
+          {(displayName && displayName[0]) || "?"}
+        </Avatar>
         <Typography variant="subtitle1">{displayName}</Typography>
         <Typography variant="caption" sx={{ ml: "auto" }}>
           {formatTimestamp(date)}
         </Typography>
       </Box>
 
-      <Typography className="comment-content" variant="body1">
-        {content}
-      </Typography>
+      <ExpandableText
+        text={content}
+        lines={5}
+        variant="body1"
+        contentClassName="comment-content"
+      />
 
       {/* Display attachments if any */}
       {attachments && attachments.length > 0 && (
@@ -164,9 +178,9 @@ const Comment = ({
 
       <Box display="flex" justifyContent="flex-start">
         <Button
+          variant="text"
           sx={{ mt: 1, mb: 1 }}
           onClick={() => setIsReplying(!isReplying)}
-          className="general-button"
         >
           {isReplying ? "Cancel" : "Reply"}
         </Button>
@@ -177,8 +191,9 @@ const Comment = ({
           sx={{
             mt: 2,
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" }, // Column on small screens, row on medium and up
-            alignItems: { xs: "stretch", sm: "flex-start" },
+            // Always stack reply input above the Submit button (no breakpoint-dependent row layout)
+            flexDirection: "column",
+            alignItems: "stretch",
             marginBottom: "20px",
             gap: "10px",
           }}
@@ -204,10 +219,13 @@ const Comment = ({
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleReplySubmit(e);
-                }
+                // Enter inserts a newline (native textarea behavior).
+                // Cmd/Ctrl+Enter submits.
+                // Avoid interfering with IME composition.
+                if (e.isComposing) return;
+                if (!(e.key === "Enter" && (e.metaKey || e.ctrlKey))) return;
+                e.preventDefault();
+                handleReplySubmit(e);
               }}
               // Use dragenter instead of dragover for less frequent events
               onDragEnter={(e) => {
@@ -379,7 +397,7 @@ const Comment = ({
               sx={{
                 display: "block",
                 textAlign: "right",
-                mt: 0.5,
+                mt: 1,
                 color:
                   replyContent.length >= MAX_REPLY_LENGTH
                     ? "#ff6b6b"
@@ -495,9 +513,8 @@ const Comment = ({
                 display: "flex",
                 gap: 1,
                 justifyContent: "center",
-                width: { xs: "100%", sm: "auto" },
+                width: "100%",
               }}
-              className="general-button"
             >
               <ChatIcon />
               Submit
@@ -511,6 +528,7 @@ const Comment = ({
           <ReplyComment
             key={reply.id}
             name={reply.name}
+            picture={reply.picture}
             content={reply.content}
             attachments={reply.attachments}
             date={reply.date}

@@ -268,7 +268,6 @@ const LoginPage = () => {
               <Button
                 type="submit"
                 variant="contained"
-                className="general-button"
                 disabled={isSubmitDisabled()}
                 sx={{ minHeight: 48, position: "relative", width: "100%" }}
               >
