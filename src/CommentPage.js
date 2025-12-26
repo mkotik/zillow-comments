@@ -17,6 +17,7 @@ import {
   formatZillowAddressLabel,
 } from "./helpers";
 import ChatIcon from "./assets/chatIcon";
+import AnonymousIcon from "./assets/anonymousIcon";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
@@ -124,13 +125,40 @@ const CommentPage = ({ zillowUrlState }) => {
           Signed in as{" "}
           {formatDisplayName(currentUser?.name || currentUser?.email || "User")}
           {currentUser?.anonymousMode && (
-            <Typography
-              component="span"
-              variant="caption"
-              sx={{ ml: 1, fontWeight: 600, opacity: 0.75 }}
-            >
-              Anonymous mode
-            </Typography>
+            <Tooltip title="Anonymous mode" placement="top">
+              <Box
+                component="span"
+                tabIndex={0}
+                aria-label="Anonymous mode"
+                sx={{
+                  ml: 0.5,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  verticalAlign: "middle",
+                  lineHeight: 0,
+                  color: "rgba(229,231,235,0.9)",
+                  borderRadius: "999px",
+                  px: 0.75,
+                  py: 0.25,
+                  backgroundColor: "transparent",
+                  border: "1px solid transparent",
+                  transition:
+                    "background-color 160ms ease, border-color 160ms ease, transform 120ms ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,106,255,0.12)",
+                    borderColor: "rgba(0,106,255,0.35)",
+                  },
+                  "&:active": { transform: "translateY(1px)" },
+                  "&:focus-visible": {
+                    outline: "2px solid rgba(0,106,255,0.85)",
+                    outlineOffset: "2px",
+                  },
+                }}
+              >
+                <AnonymousIcon size={16} />
+              </Box>
+            </Tooltip>
           )}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
