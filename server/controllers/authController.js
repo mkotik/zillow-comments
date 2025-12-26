@@ -30,6 +30,8 @@ function publicUser(user) {
     picture: effectivePicture,
     profilePictureUrl,
     profilePictureHidden,
+    anonymousMode: !!user.anonymousMode,
+    anonymousUsername: user.anonymousUsername || "",
   };
 }
 
@@ -238,7 +240,12 @@ exports.updateMe = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const { profilePictureUrl, profilePictureHidden } = req.body || {};
+    const {
+      profilePictureUrl,
+      profilePictureHidden,
+      anonymousMode,
+      anonymousUsername,
+    } = req.body || {};
 
     if (profilePictureHidden !== undefined) {
       if (typeof profilePictureHidden !== "boolean") {
@@ -269,6 +276,48 @@ exports.updateMe = async (req, res) => {
 
       // If a custom URL is being set, it always becomes visible.
       if (trimmed) user.profilePictureHidden = false;
+    }
+
+    if (anonymousMode !== undefined) {
+      if (typeof anonymousMode !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "anonymousMode must be a boolean" });
+      }
+      user.anonymousMode = anonymousMode;
+    }
+
+    if (anonymousUsername !== undefined) {
+      if (typeof anonymousUsername !== "string") {
+        return res
+          .status(400)
+          .json({ message: "anonymousUsername must be a string" });
+      }
+
+      const trimmed = anonymousUsername.trim();
+
+      // allow clearing with ""
+      if (trimmed) {
+        if (trimmed.length < 3 || trimmed.length > 32) {
+          return res
+            .status(400)
+            .json({ message: "anonymousUsername must be 3–32 characters" });
+        }
+        if (!/^[A-Za-z0-9_-]+$/.test(trimmed)) {
+          return res.status(400).json({
+            message:
+              "anonymousUsername may contain only letters, numbers, underscores, and dashes",
+          });
+        }
+      }
+
+      user.anonymousUsername = trimmed;
+    }
+
+    if (user.anonymousMode && !user.anonymousUsername) {
+      return res.status(400).json({
+        message: "anonymousUsername is required when anonymousMode is enabled",
+      });
     }
 
     await user.save();

@@ -4,14 +4,20 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   IconButton,
+  Switch,
+  TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useLocation, useNavigate } from "react-router-dom";
 import api, { authStorage } from "./api/client";
+import { generateAnonName } from "./helpers";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -37,6 +43,15 @@ export default function SettingsPage() {
   const [user, setUser] = useState(() => authStorage.getUser());
   const picture = pictureOverride ?? user?.picture ?? "";
 
+  const [anonymousMode, setAnonymousMode] = useState(() => {
+    const u = authStorage.getUser();
+    return !!u?.anonymousMode;
+  });
+  const [anonymousUsername, setAnonymousUsername] = useState(() => {
+    const u = authStorage.getUser();
+    return u?.anonymousUsername || "";
+  });
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -54,6 +69,48 @@ export default function SettingsPage() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    setAnonymousMode(!!user?.anonymousMode);
+    setAnonymousUsername(user?.anonymousUsername || "");
+  }, [user]);
+
+  const anonUsernameError = useMemo(() => {
+    if (!anonymousMode) return "";
+    const trimmed = String(anonymousUsername || "").trim();
+    if (!trimmed) return "Anonymous username is required.";
+    if (trimmed.length < 3 || trimmed.length > 32)
+      return "Use 3–32 characters.";
+    if (!/^[A-Za-z0-9_-]+$/.test(trimmed))
+      return "Use letters, numbers, underscores, or dashes only.";
+    return "";
+  }, [anonymousMode, anonymousUsername]);
+
+  const saveAnonymousSettings = async (overrides = {}) => {
+    setError("");
+    setSaving(true);
+    try {
+      const payload = {
+        anonymousMode,
+        anonymousUsername,
+        ...overrides,
+      };
+      const meRes = await api.patch("/auth/me", payload);
+      const updatedUser = meRes?.data?.user;
+      if (updatedUser) {
+        authStorage.setUser(updatedUser);
+        setUser(updatedUser);
+      }
+    } catch (e) {
+      setError(
+        e?.response?.data?.message ||
+          e?.message ||
+          "Failed to update anonymous settings"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const uploadAndSave = async (file) => {
     setError("");
@@ -254,6 +311,85 @@ export default function SettingsPage() {
           <Typography variant="body2" sx={{ mt: 1, color: "error.main" }}>
             {error}
           </Typography>
+        )}
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <Divider sx={{ mb: 2, opacity: 0.35 }} />
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+              Anonymous mode
+            </Typography>
+            <Tooltip
+              title="When enabled, your new comments and replies will show the anonymous username you choose here instead of your real name."
+              placement="top"
+            >
+              <IconButton
+                size="small"
+                aria-label="What is anonymous mode?"
+                sx={{ opacity: 0.85 }}
+              >
+                <InfoOutlinedIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Switch
+            checked={anonymousMode}
+            disabled={saving}
+            onChange={async (e) => {
+              const next = e.target.checked;
+              setAnonymousMode(next);
+
+              let nextUsername = anonymousUsername;
+              if (next && !String(nextUsername || "").trim()) {
+                nextUsername = generateAnonName();
+                setAnonymousUsername(nextUsername);
+              }
+
+              await saveAnonymousSettings({
+                anonymousMode: next,
+                anonymousUsername: next ? nextUsername : anonymousUsername,
+              });
+            }}
+          />
+        </Box>
+
+        {anonymousMode && (
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Anonymous username"
+              value={anonymousUsername}
+              disabled={saving}
+              onChange={(e) => setAnonymousUsername(e.target.value)}
+              error={!!anonUsernameError}
+              helperText={
+                anonUsernameError ||
+                "Shown on your new comments/replies while Anonymous mode is on."
+              }
+            />
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1.5 }}>
+              <Button
+                variant="contained"
+                disabled={saving || !!anonUsernameError}
+                onClick={() => saveAnonymousSettings()}
+                sx={{ textTransform: "none", fontWeight: 800 }}
+              >
+                {saving ? <CircularProgress size={18} /> : "Save"}
+              </Button>
+            </Box>
+          </Box>
         )}
       </Box>
     </Box>

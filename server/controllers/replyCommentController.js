@@ -19,11 +19,15 @@ exports.createReplyComment = async (req, res) => {
   const attachments = req.body.attachments || [];
   console.log("Reply attachments:", attachments);
 
+  const replyAuthorName = user.anonymousMode
+    ? user.anonymousUsername || "Anonymous"
+    : user.name || user.email;
+
   const newComment = new ReplyComment({
     id: uuidv4(),
     address: req.body.address,
     userId: user._id,
-    name: user.name || user.email,
+    name: replyAuthorName,
     content: req.body.content,
     attachments: attachments, // Explicitly set attachments
     parentCommentId: req.body.parentCommentId,

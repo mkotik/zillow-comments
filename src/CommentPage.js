@@ -123,6 +123,15 @@ const CommentPage = ({ zillowUrlState }) => {
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           Signed in as{" "}
           {formatDisplayName(currentUser?.name || currentUser?.email || "User")}
+          {currentUser?.anonymousMode && (
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{ ml: 1, fontWeight: 600, opacity: 0.75 }}
+            >
+              Anonymous mode
+            </Typography>
+          )}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <Tooltip title="Settings">

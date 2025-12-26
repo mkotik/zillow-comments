@@ -93,11 +93,15 @@ exports.createComment = async (req, res) => {
   const attachments = req.body.attachments || [];
   console.log("Comment attachments:", attachments);
 
+  const commentAuthorName = user.anonymousMode
+    ? user.anonymousUsername || "Anonymous"
+    : user.name || user.email;
+
   const newComment = new Comment({
     id: uuidv4(),
     address: req.body.address,
     userId: user._id,
-    name: user.name || user.email,
+    name: commentAuthorName,
     content: req.body.content,
     attachments: attachments,
     date: req.body.date || Date.now(),

@@ -38,6 +38,17 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: false,
     },
+    anonymousMode: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    anonymousUsername: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "",
+    },
   },
   { timestamps: true }
 );
@@ -45,5 +56,3 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
-
-
