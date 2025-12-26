@@ -99,7 +99,9 @@ exports.uploadFiles = (req, res) => {
             contentType = "image/jpeg";
             ext = ".jpg";
           } catch (compressionError) {
-            console.error(`Error processing profile image: ${compressionError.message}`);
+            console.error(
+              `Error processing profile image: ${compressionError.message}`
+            );
             return res.status(400).json({ error: "Invalid profile image" });
           }
         } else if (isImage && file.size > 1 * 1024 * 1024) {
@@ -135,7 +137,8 @@ exports.uploadFiles = (req, res) => {
         }
 
         // Generate a unique filename
-        const fileName = `${uuidv4()}${ext}`;
+        const prefix = isProfile ? "profilePictures" : "commentAttachments";
+        const fileName = `${prefix}/${uuidv4()}${ext}`;
 
         // Upload to Backblaze B2
         const uploadParams = {
@@ -183,9 +186,26 @@ exports.deleteFile = async (req, res) => {
       return res.status(400).json({ error: "File URL is required" });
     }
 
-    // Extract key from the file URL
-    const urlParts = fileUrl.split("/");
-    const key = urlParts[urlParts.length - 1];
+    // Extract key from the file URL (including folder/prefix)
+    let key = "";
+    try {
+      const u = new URL(fileUrl);
+      key = String(u.pathname || "").replace(/^\/+/, "");
+    } catch (_) {
+      key = String(fileUrl || "").replace(/^https?:\/\/[^/]+\//i, "");
+    }
+
+    // Backblaze S3 URL format often includes bucket name in the path: /<bucket>/<key>
+    const bucket = String(process.env.B2_BUCKET_NAME || "");
+    if (bucket && key.startsWith(`${bucket}/`)) {
+      key = key.slice(bucket.length + 1);
+    }
+
+    // Safety guard: only allow deletes within our managed prefixes
+    const allowed = ["profilePictures/", "commentAttachments/"];
+    if (!allowed.some((p) => key.startsWith(p))) {
+      return res.status(400).json({ error: "Invalid file key" });
+    }
 
     console.log(`Attempting to delete file from Backblaze B2: ${key}`);
 
@@ -202,11 +222,9 @@ exports.deleteFile = async (req, res) => {
       .json({ message: "File deleted successfully from Backblaze B2" });
   } catch (error) {
     console.error("Error deleting file from Backblaze B2:", error);
-    res
-      .status(500)
-      .json({
-        error: "Failed to delete file from Backblaze B2",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to delete file from Backblaze B2",
+      details: error.message,
+    });
   }
 };
