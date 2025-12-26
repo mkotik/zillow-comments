@@ -2,19 +2,14 @@
   text-align: center;
   margin: 0;
   background: transparent;
-  > div,
+  color: #e5e7eb;
+
   input,
   textarea {
-    color: white !important;
+    color: #e5e7eb !important;
     margin: 0;
     background: transparent;
     box-shadow: none;
-    label {
-      color: white !important;
-    }
-    > div {
-      max-width: 100%;
-    }
   }
 }
 
@@ -59,9 +54,6 @@
   border-radius: 5px;
   p {
     text-align: left;
-  }
-  button {
-    float: left;
   }
 }
 
@@ -108,14 +100,21 @@
 
 .comment-input {
   margin-bottom: 2;
-  background-color: #1f2a37;
-  border: 1px solid #4b5663 !important;
-  border-radius: 5px;
   position: relative;
   transition: all 0.3s ease;
 
   .MuiInputBase-root {
     padding: 0px !important;
+  }
+
+  /* Ensure border radius is applied to the actual outlined input + outline */
+  .MuiOutlinedInput-root {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  fieldset {
+    border-radius: 14px;
   }
 
   textarea {
@@ -152,7 +151,7 @@
     justify-content: center;
     z-index: 10;
     pointer-events: none;
-    border-radius: 4px;
+    border-radius: 14px;
     transition: all 0.3s ease;
   }
 

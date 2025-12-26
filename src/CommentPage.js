@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Paper,
   Typography,
   TextField,
   Button,
@@ -12,7 +11,11 @@ import {
 } from "@mui/material";
 import Comment from "./Comment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { parseAddress, formatDisplayName, formatZillowAddressLabel } from "./helpers";
+import {
+  parseAddress,
+  formatDisplayName,
+  formatZillowAddressLabel,
+} from "./helpers";
 import ChatIcon from "./assets/chatIcon";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -102,7 +105,13 @@ const CommentPage = ({ zillowUrlState }) => {
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
+    <Box
+      sx={{
+        p: 2,
+        maxWidth: 600,
+        mx: "auto",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -118,7 +127,9 @@ const CommentPage = ({ zillowUrlState }) => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <Tooltip title="Settings">
             <IconButton
-              onClick={() => navigate("/settings", { state: { from: location } })}
+              onClick={() =>
+                navigate("/settings", { state: { from: location } })
+              }
               size="small"
               aria-label="Settings"
             >
@@ -126,7 +137,11 @@ const CommentPage = ({ zillowUrlState }) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Sign out">
-            <IconButton onClick={handleSignOut} size="small" aria-label="Sign out">
+            <IconButton
+              onClick={handleSignOut}
+              size="small"
+              aria-label="Sign out"
+            >
               <LogoutIcon />
             </IconButton>
           </Tooltip>
@@ -462,10 +477,12 @@ const CommentPage = ({ zillowUrlState }) => {
             }}
           >
             <Button
-              className="comment-button general-button"
+              className="comment-button"
               type="submit"
               variant="contained"
-              disabled={!address || (!comment.trim() && attachments.length === 0)}
+              disabled={
+                !address || (!comment.trim() && attachments.length === 0)
+              }
               sx={{
                 minWidth: { sm: "180px" },
                 height: { xs: "50px", sm: "100px" },
@@ -474,10 +491,7 @@ const CommentPage = ({ zillowUrlState }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "bold",
-                width: { xs: "100%", sm: "auto" },
-                "&:hover": {
-                  backgroundColor: "#005ce0 !important",
-                },
+                width: "100% !important",
               }}
             >
               <ChatIcon />
@@ -500,7 +514,7 @@ const CommentPage = ({ zillowUrlState }) => {
           setComments={setComments}
         />
       ))}
-    </Paper>
+    </Box>
   );
 };
 

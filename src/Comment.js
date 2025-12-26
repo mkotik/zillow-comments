@@ -164,9 +164,9 @@ const Comment = ({
 
       <Box display="flex" justifyContent="flex-start">
         <Button
+          variant="text"
           sx={{ mt: 1, mb: 1 }}
           onClick={() => setIsReplying(!isReplying)}
-          className="general-button"
         >
           {isReplying ? "Cancel" : "Reply"}
         </Button>
@@ -177,8 +177,9 @@ const Comment = ({
           sx={{
             mt: 2,
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" }, // Column on small screens, row on medium and up
-            alignItems: { xs: "stretch", sm: "flex-start" },
+            // Always stack reply input above the Submit button (no breakpoint-dependent row layout)
+            flexDirection: "column",
+            alignItems: "stretch",
             marginBottom: "20px",
             gap: "10px",
           }}
@@ -495,9 +496,8 @@ const Comment = ({
                 display: "flex",
                 gap: 1,
                 justifyContent: "center",
-                width: { xs: "100%", sm: "auto" },
+                width: "100%",
               }}
-              className="general-button"
             >
               <ChatIcon />
               Submit

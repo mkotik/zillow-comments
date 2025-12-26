@@ -290,7 +290,6 @@ const FileUpload = ({ onUploadComplete, maxFiles = 5 }) => {
               onClick={uploadFiles}
               disabled={files.length === 0}
               sx={{ mt: 1 }}
-              className="general-button"
             >
               Upload {files.length} {files.length === 1 ? "file" : "files"}
             </Button>
