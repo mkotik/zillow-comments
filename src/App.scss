@@ -4,12 +4,36 @@
   background: transparent;
   color: #e5e7eb;
 
+  /* Global layout: allow a footer to sit at the bottom */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
   input,
   textarea {
     color: #e5e7eb !important;
     margin: 0;
     background: transparent;
     box-shadow: none;
+  }
+}
+
+.App-main {
+  flex: 1;
+}
+
+.App-footer {
+  border-top: 1px solid rgba(229, 231, 235, 0.12);
+  background: rgba(31, 42, 55, 0.35);
+  backdrop-filter: blur(6px);
+
+  a {
+    color: rgba(229, 231, 235, 0.85);
+    font-weight: 700;
+  }
+
+  a:hover {
+    color: #dbeafe;
   }
 }
 
