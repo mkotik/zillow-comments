@@ -195,8 +195,11 @@ textarea:-webkit-autofill:focus,
 }
 
 .comment-content,
+.reply-content,
 .reply-comment-content {
   hyphens: auto;
+  white-space: pre-wrap; /* preserve newlines + sequences of spaces */
+  overflow-wrap: anywhere; /* prevent long unbroken strings from overflowing */
 }
 
 /* File upload styles */

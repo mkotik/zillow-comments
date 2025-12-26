@@ -197,10 +197,13 @@ const CommentPage = ({ zillowUrlState }) => {
                 position: "relative", // Ensure position is relative for overlay
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
+                // Enter inserts a newline (native textarea behavior).
+                // Cmd/Ctrl+Enter submits.
+                // Avoid interfering with IME composition.
+                if (e.isComposing) return;
+                if (!(e.key === "Enter" && (e.metaKey || e.ctrlKey))) return;
+                e.preventDefault();
+                handleSubmit(e);
               }}
               // Use dragenter instead of dragover for less frequent events
               onDragEnter={(e) => {
@@ -372,13 +375,19 @@ const CommentPage = ({ zillowUrlState }) => {
               sx={{
                 display: "block",
                 textAlign: "right",
-                mt: 0.5,
+                mt: 1,
                 color:
                   comment.length >= MAX_COMMENT_LENGTH ? "#ff6b6b" : "inherit",
               }}
             >
               {comment.length}/{MAX_COMMENT_LENGTH} characters
             </Typography>
+            {/* <Typography
+              variant="caption"
+              sx={{ display: "block", textAlign: "right", opacity: 0.8 }}
+            >
+              Cmd/Ctrl+Enter to post
+            </Typography> */}
 
             {/* Attachment previews below the text input */}
             {attachments.length > 0 && (

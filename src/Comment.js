@@ -205,15 +205,13 @@ const Comment = ({
                 }
               }}
               onKeyDown={(e) => {
-                // Enter should create a newline; Cmd/Ctrl+Enter submits.
+                // Enter inserts a newline (native textarea behavior).
+                // Cmd/Ctrl+Enter submits.
                 // Avoid interfering with IME composition.
                 if (e.isComposing) return;
-                const isSubmitChord =
-                  e.key === "Enter" && (e.metaKey || e.ctrlKey);
-                if (isSubmitChord) {
-                  e.preventDefault();
-                  handleReplySubmit(e);
-                }
+                if (!(e.key === "Enter" && (e.metaKey || e.ctrlKey))) return;
+                e.preventDefault();
+                handleReplySubmit(e);
               }}
               // Use dragenter instead of dragover for less frequent events
               onDragEnter={(e) => {
@@ -385,7 +383,7 @@ const Comment = ({
               sx={{
                 display: "block",
                 textAlign: "right",
-                mt: 0.5,
+                mt: 1,
                 color:
                   replyContent.length >= MAX_REPLY_LENGTH
                     ? "#ff6b6b"
