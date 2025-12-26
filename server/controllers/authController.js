@@ -18,12 +18,20 @@ function normalizeEmail(email) {
 }
 
 function publicUser(user) {
+  const profilePictureUrl = user.profilePictureUrl || "";
+  const profilePictureHidden = !!user.profilePictureHidden;
+  const googlePicture = user.picture || "";
+  const effectivePicture = profilePictureHidden
+    ? ""
+    : profilePictureUrl || googlePicture;
+
   return {
     id: String(user._id),
     email: user.email,
     name: user.name || "",
-    picture: user.profilePictureUrl || user.picture || "",
-    profilePictureUrl: user.profilePictureUrl || "",
+    picture: effectivePicture,
+    profilePictureUrl,
+    profilePictureHidden,
   };
 }
 
@@ -232,7 +240,16 @@ exports.updateMe = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const { profilePictureUrl } = req.body || {};
+    const { profilePictureUrl, profilePictureHidden } = req.body || {};
+
+    if (profilePictureHidden !== undefined) {
+      if (typeof profilePictureHidden !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "profilePictureHidden must be a boolean" });
+      }
+      user.profilePictureHidden = profilePictureHidden;
+    }
 
     if (profilePictureUrl !== undefined) {
       if (typeof profilePictureUrl !== "string") {
@@ -251,6 +268,9 @@ exports.updateMe = async (req, res) => {
       }
 
       user.profilePictureUrl = trimmed;
+
+      // If a custom URL is being set, it always becomes visible.
+      if (trimmed) user.profilePictureHidden = false;
     }
 
     await user.save();

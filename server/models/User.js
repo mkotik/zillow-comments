@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    profilePictureHidden: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   { timestamps: true }
 );
