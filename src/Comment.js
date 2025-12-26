@@ -9,6 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ReplyComment from "./ReplyComment";
+import ExpandableText from "./ExpandableText";
 import ChatIcon from "./assets/chatIcon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -101,9 +102,12 @@ const Comment = ({
         </Typography>
       </Box>
 
-      <Typography className="comment-content" variant="body1">
-        {content}
-      </Typography>
+      <ExpandableText
+        text={content}
+        lines={5}
+        variant="body1"
+        contentClassName="comment-content"
+      />
 
       {/* Display attachments if any */}
       {attachments && attachments.length > 0 && (
