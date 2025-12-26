@@ -153,12 +153,8 @@ const CommentPage = ({ zillowUrlState }) => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "row" },
-            justifyContent: "center",
-            "@media (max-width: 400px)": {
-              flexDirection: "column",
-              justifyContent: "flex-start !important",
-            },
+            flexDirection: "column",
+            justifyContent: "flex-start",
             gap: "10px",
             width: "100%",
             alignItems: "stretch",
